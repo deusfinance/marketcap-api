@@ -26,7 +26,7 @@ chain_configs = {
             "bridgePool": "0x1e323B29DeBdd06e5Fa498D380952ae41F46E6E8",
             "Migrator": "0xD6739b3012Dd4179C0Cb45C57e6eADD063983143",
         },
-        'http_rpc': 'https://matic-mainnet-full-rpc.bwarelabs.com'
+        'http_rpc': 'https://polygon-mainnet-public.unifra.io'
     },
     'arbitrum': {
         'main_contract': '0xDE5ed76E7c05eC5e4572CfC88d1ACEA165109E44',
@@ -38,7 +38,7 @@ chain_configs = {
         'main_contract': '0xDE5ed76E7c05eC5e4572CfC88d1ACEA165109E44',
         'non_circulating_contracts': {
         },
-        'http_rpc': 'https://rpc-bsc.bnb48.club'
+        'http_rpc': 'https://bsc-dataseed3.ninicoin.io'
     },
     'eth': {
         'main_contract': '0xDE5ed76E7c05eC5e4572CfC88d1ACEA165109E44',
@@ -55,3 +55,4 @@ chain_configs = {
 }
 
 update_timeout = 4
+redis_prefix = "MARKET_CAP"

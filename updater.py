@@ -3,7 +3,7 @@ import time
 
 import web3
 
-from configs import chain_configs, update_timeout
+from configs import chain_configs, update_timeout, redis_prefix
 from redis_client import redis_client
 from multicallable import Multicallable
 
@@ -27,5 +27,5 @@ while True:
                            config['chain_multicallable'].balanceOf(config['non_circulating_contracts'].values())]
             total_supply -= sum(nc_balances)
         print(str(total_supply))
-        redis_client.set(chain, total_supply)
+        redis_client.set(redis_prefix + chain, total_supply)
     time.sleep(update_timeout)
