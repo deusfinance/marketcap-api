@@ -6,7 +6,7 @@ from redis_client import redis_client
 app = Flask(__name__)
 
 
-@app.route("/")
+@app.route("/get-market-caps")
 def get_market_caps():
     res = {}
     for chain, config in chain_configs.items():
