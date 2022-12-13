@@ -15,7 +15,7 @@ def get_market_caps():
 
 
 @app.route("/marketCap/<chain>")
-def get_market_caps(chain):
+def get_market_cap(chain):
     if chain.lower() not in chain_configs:
         return jsonify(status='error', msg=f'Invalid chain: `{chain}`'), 400
 
