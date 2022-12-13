@@ -54,5 +54,5 @@ chain_configs = {
     }
 }
 
-update_timeout = 4
+update_timeout = 60
 redis_prefix = "MARKET_CAP"
