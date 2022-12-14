@@ -21,17 +21,17 @@ def get_market_cap():
         circulating_supply = supply - int(redis_client.get(NC_SUPPLY_REDIS_PREFIX + chain))
         market_cap = round(supply * price / 1e18)
         circulating_market_cap = round(circulating_supply * price / 1e18)
-        result[chain] = dict(totalSupply=supply,
-                             circulatingSupply=circulating_supply,
-                             totalMarketCap=market_cap,
-                             circulatingMarketCap=circulating_market_cap)
+        result[chain] = dict(totalSupply=str(supply),
+                             circulatingSupply=str(circulating_supply),
+                             totalMarketCap=str(market_cap),
+                             circulatingMarketCap=str(circulating_market_cap))
         totalAmounts['totalSupply'] += supply
         totalAmounts['circulatingSupply'] += circulating_supply
         totalAmounts['totalMarketCap'] += market_cap
         totalAmounts['circulatingMarketCap'] += circulating_market_cap
 
-    result['total'] = totalAmounts
-    return result
+    result['total'] = {k: str(v) for k, v in totalAmounts.items()}
+    return jsonify(result)
 
 
 @app.route('/getCirculatingSupplies')
@@ -39,7 +39,7 @@ def get_circulating_supplies():
     res = {}
     for chain in chains:
         res[chain] = int(redis_client.get(NC_SUPPLY_REDIS_PREFIX + chain))
-    return res
+    return jsonify(res)
 
 
 @app.route('/circulatingSupply/<chain>')
