@@ -5,7 +5,7 @@ import web3
 from multicallable import Multicallable
 from web3 import HTTPProvider
 
-from constants import DEUS_ADDRESS, SPOOKY_USDC_FTM, SPOOKY_FTM_DEUS, PAIR_ABI
+from constants import DEUS_ADDRESS, SPOOKY_USDC_FTM, SPOOKY_FTM_DEUS, PAIR_ABI, non_circulating_contracts
 from config import rpcs
 
 with open('abi.json') as fp:
@@ -33,7 +33,10 @@ class RPCManager:
 
         w3 = self.get_w3()
         self.deus_contract = w3.eth.contract(DEUS_ADDRESS, abi=abi)
-        self.mc = Multicallable(DEUS_ADDRESS, abi, w3)
+        if non_circulating_contracts[chain_name]:
+            self.mc = Multicallable(DEUS_ADDRESS, abi, w3)
+        else:
+            self.mc = None
 
     def get_w3(self):
         for rpc in self.rpcs:
@@ -45,4 +48,5 @@ class RPCManager:
     def update_rpc(self):
         w3 = self.get_w3()
         self.deus_contract = w3.eth.contract(DEUS_ADDRESS, abi=abi)
-        self.mc = Multicallable(DEUS_ADDRESS, abi, w3)
+        if self.mc is not None:
+            self.mc = Multicallable(DEUS_ADDRESS, abi, w3)

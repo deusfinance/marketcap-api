@@ -4,7 +4,7 @@ from constants import non_circulating_contracts
 from config import PRICE_REDIS_TAG, REDIS_PREFIX
 from redis_client import redis_client
 
-chains = list(non_circulating_contracts.values())
+chains = list(non_circulating_contracts)
 app = Flask(__name__)
 
 
