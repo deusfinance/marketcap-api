@@ -1,37 +1,38 @@
-import json
 import time
 
-import web3
-
-from configs import chain_configs, update_timeout, redis_prefix
+from config import update_timeout, REDIS_PREFIX, PRICE_REDIS_TAG
+from constants import non_circulating_contracts
 from redis_client import redis_client
-from multicallable import Multicallable
 
-with open('abi.json') as fp:
-    abi = json.load(fp)
+from utils import RPCManager, deus_spooky
 
 
 def run_updator():
-    for chain, config in chain_configs.items():
-        address = config['main_contract']
-        w3 = web3.Web3(web3.HTTPProvider(config['http_rpc']))
-        config['main_contract'] = w3.eth.contract(address=address, abi=abi)
-        if len(config['non_circulating_contracts']) > 0:
-            config['chain_multicallable'] = Multicallable(address, abi, w3)
+    managers = {}
+    for chain, _ in non_circulating_contracts.items():
+        managers[chain] = RPCManager(chain)
 
     while True:
-        for chain, config in chain_configs.items():
+        for chain, contracts in non_circulating_contracts.items():
+            deus_contract = managers[chain].deus_contract
+            mc = managers[chain].mc
             print('Checking ' + chain)
             try:
-                total_supply = config['main_contract'].functions.totalSupply().call()
-                if len(config['non_circulating_contracts']) > 0:
-                    nc_balances = [a[0] for a in config['chain_multicallable'].balanceOf(
-                        config['non_circulating_contracts'].values())]
-                    total_supply -= sum(nc_balances)
-                print(str(total_supply))
-                redis_client.set(redis_prefix + chain, total_supply)
+                total_supply = deus_contract.functions.totalSupply().call()
+                if contracts:
+                    nc_supply = sum(balance[0] for balance in mc.balanceOf(contracts.values()))
+                    total_supply -= nc_supply
+                print(total_supply)
+                redis_client.set(REDIS_PREFIX + chain, total_supply)
             except Exception as ex:
                 print('Error:', ex)
+                managers[chain].update_rpc()
+
+        try:
+            redis_client.set(PRICE_REDIS_TAG, str(deus_spooky()))
+        except Exception as ex:
+            print('Error:', ex)
+
         time.sleep(update_timeout)
 
 
