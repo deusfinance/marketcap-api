@@ -5,7 +5,7 @@ non_circulating_contracts = {
         "MasterChefV2 old": "0x120FF9821817eA2bbB700e1131e5c856ccC20d1b",
         "Minter Pool": "0x6E0098A8c651F7A6A9510B270CD02c858C344D94",
         "DUES BAG": "0xC59A3F19bf33D318F4e3eef248ACFE9B37bfc947",
-        "AnyswapV6ERC20": "0xf7b38053A4885c99279c4955CB843797e04455f8",
+        "bridgePool": "0xf7b38053A4885c99279c4955CB843797e04455f8",
         "gnosisSafe": "0x467694A3c9afFfDEB66e2E31F141148287D3Ad1E",
         "TimeBasedMasterChefRewarder": "0x90177BF4f4a5aaF5812508dbC1EBA8752C5cd605",
         "ComplexRewarder": "0xDdB816c59200aF55b1Ca20735Ef086626a2C6a8D",
@@ -21,10 +21,13 @@ non_circulating_contracts = {
         "Migrator": "0xD6739b3012Dd4179C0Cb45C57e6eADD063983143",
     },
     'arbitrum': {
+        'bridgePool': '0x6fF0609046A38D76Bd40C5863b4D1a2dCe687f73'
     },
     'bsc': {
+        'bridgePool': '0xc0DD739C4A190a45C91ED3EC587B1F3fc4d31BA6'
     },
     'mainnet': {
+        'bridgePool': '0x5fd564518A71AAB9B1D0Ac6D5825bbBC46a5845e'
     },
     'metis': {
     }
