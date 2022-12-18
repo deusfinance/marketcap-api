@@ -15,6 +15,7 @@ non_circulating_contracts = {
         "TimeBasedMasterChefRewarder1": "0xA81E2bA1035f973c734f1eD23a0c0D6d197dd229",
         "TimeBasedMasterChefRewarder2": "0x58b86B32F560d025594ADFF02073Ae18976C4700",
         "Admin Wallet": "0xE5227F141575DcE74721f4A9bE2D7D636F923044",
+        "veDIST": "0x09cE8C8E2704E84750E9c1a4F54A30eF60aF0073",
     },
     'polygon': {
         "bridgePool": "0x1e323B29DeBdd06e5Fa498D380952ae41F46E6E8",

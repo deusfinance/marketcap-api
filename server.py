@@ -14,7 +14,7 @@ def get_market_cap():
     result = {}
     totalAmounts = dict(totalSupply=0,
                         circulatingSupply=0,
-                        totalMarketCap=0,
+                        FDV=0,
                         circulatingMarketCap=0)
     for chain in chains:
         supply = int(redis_client.get(TOTAL_SUPPLY_REDIS_PREFIX + chain))
@@ -23,11 +23,11 @@ def get_market_cap():
         circulating_market_cap = round(circulating_supply * price / 1e18)
         result[chain] = dict(totalSupply=str(supply),
                              circulatingSupply=str(circulating_supply),
-                             totalMarketCap=str(market_cap),
+                             FDV=str(market_cap),
                              circulatingMarketCap=str(circulating_market_cap))
         totalAmounts['totalSupply'] += supply
         totalAmounts['circulatingSupply'] += circulating_supply
-        totalAmounts['totalMarketCap'] += market_cap
+        totalAmounts['FDV'] += market_cap
         totalAmounts['circulatingMarketCap'] += circulating_market_cap
 
     result['total'] = {k: str(v) for k, v in totalAmounts.items()}
