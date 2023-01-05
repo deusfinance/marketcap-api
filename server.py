@@ -11,7 +11,7 @@ app = Flask(__name__)
 @app.route('/getMarketCap')
 def get_market_cap():
     price = float(redis_client.get(PRICE_REDIS_TAG))
-    result = dict(deusPrice=str(price))
+    result = dict(deusPrice=str(price), result={})
     totalAmounts = dict(totalSupply=0,
                         circulatingSupply=0,
                         FDV=0,
@@ -21,16 +21,16 @@ def get_market_cap():
         circulating_supply = supply - int(redis_client.get(NC_SUPPLY_REDIS_PREFIX + chain))
         fdv = round(supply * price / 1e18)
         market_cap = round(circulating_supply * price / 1e18)
-        result[chain] = dict(totalSupply=str(supply),
-                             circulatingSupply=str(circulating_supply),
-                             FDV=str(fdv),
-                             MarketCap=str(market_cap))
+        result['result'][chain] = dict(totalSupply=str(supply),
+                                       circulatingSupply=str(circulating_supply),
+                                       FDV=str(fdv),
+                                       MarketCap=str(market_cap))
         totalAmounts['totalSupply'] += supply
         totalAmounts['circulatingSupply'] += circulating_supply
         totalAmounts['FDV'] += fdv
         totalAmounts['MarketCap'] += market_cap
 
-    result['total'] = {k: str(v) for k, v in totalAmounts.items()}
+    result['result']['total'] = {k: str(v) for k, v in totalAmounts.items()}
     return jsonify(result)
 
 
