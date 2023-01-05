@@ -1,7 +1,7 @@
 import time
 
 from config import update_timeout, NC_SUPPLY_REDIS_PREFIX, PRICE_REDIS_TAG, TOTAL_SUPPLY_REDIS_PREFIX
-from constants import non_circulating_contracts
+from constants import non_circulating_contracts, bridge_pools
 from redis_client import redis_client
 
 from utils import RPCManager, deus_spooky
@@ -18,7 +18,11 @@ def run_updator():
             mc = managers[chain].mc
             print(f'{chain:.^40}')
             try:
-                total_supply = deus_contract.functions.totalSupply().call()
+                if chain in bridge_pools:
+                    pool_supply = deus_contract.functions.balanceOf(bridge_pools[chain]).call()
+                else:
+                    pool_supply = 0
+                total_supply = deus_contract.functions.totalSupply().call() - pool_supply
                 if contracts:
                     nc_supply = sum(balance[0] for balance in mc.balanceOf(set(contracts.values())))
                 else:
