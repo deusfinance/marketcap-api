@@ -4,6 +4,7 @@ from constants import non_circulating_contracts, xdeus_non_circulating_contracts
 from config import PRICE_REDIS_TAG, NC_SUPPLY_REDIS_PREFIX, TOTAL_SUPPLY_REDIS_PREFIX, X_NC_SUPPLY_REDIS_PREFIX, \
     X_TOTAL_SUPPLY_REDIS_PREFIX, X_PRICE_REDIS_TAG
 from redis_client import redis_client
+from utils import RouteName
 
 deus_chains = list(non_circulating_contracts)
 xdeus_chains = list(xdeus_non_circulating_contracts)
@@ -59,21 +60,58 @@ def get_market_cap():
     return jsonify(result)
 
 
-@app.route('/getCirculatingSupplies')
-def get_circulating_supplies():
-    res = {}
+@app.route('/deus/<route>')
+def get_deus_info(route):
+    if not RouteName.is_valid(route):
+        return jsonify(status='error', msg='Route not found'), 404
+    total_supply = 0
+    circulating_supply = 0
+    price = float(redis_client.get(PRICE_REDIS_TAG))
     for chain in deus_chains:
-        res[chain] = int(redis_client.get(NC_SUPPLY_REDIS_PREFIX + chain))
-    return jsonify(res)
+        supply = int(redis_client.get(TOTAL_SUPPLY_REDIS_PREFIX + chain))
+        circulating_supply += supply - int(redis_client.get(NC_SUPPLY_REDIS_PREFIX + chain))
+        total_supply += supply
+
+    if route == RouteName.CIRCULATING_SUPPLY:
+        return jsonify(round(circulating_supply))
+
+    elif route == RouteName.TOTAL_SUPPLY:
+        return jsonify(round(total_supply))
+
+    elif route == RouteName.MARKETCAP:
+        return jsonify(round(price * circulating_supply / 1e18))
+
+    elif route == RouteName.FDV:
+        return jsonify(round(price * total_supply / 1e18))
+
+    return jsonify(status='error', msg='Route not found'), 404
 
 
-@app.route('/circulatingSupply/<chain>')
-def get_circulating_supply(chain):
-    if chain.lower() not in deus_chains:
-        return jsonify(status='error', msg=f'Invalid chain: `{chain}`'), 400
+@app.route('/xdeus/<route>')
+def get_xdeus_info(route):
+    if not RouteName.is_valid(route):
+        return jsonify(status='error', msg='Route not found'), 404
+    total_supply = 0
+    circulating_supply = 0
+    price = float(redis_client.get(X_PRICE_REDIS_TAG))
+    for chain in xdeus_chains:
+        supply = int(redis_client.get(X_TOTAL_SUPPLY_REDIS_PREFIX + chain))
+        circulating_supply += supply - int(redis_client.get(X_NC_SUPPLY_REDIS_PREFIX + chain))
+        total_supply += supply
 
-    market_cap = int(redis_client.get(NC_SUPPLY_REDIS_PREFIX + chain.lower()))
-    return jsonify(status='ok', chain=chain.lower(), marketCap=market_cap), 200
+    if route == RouteName.CIRCULATING_SUPPLY:
+        return jsonify(round(circulating_supply))
+
+    elif route == RouteName.TOTAL_SUPPLY:
+        return jsonify(round(total_supply))
+
+    elif route == RouteName.MARKETCAP:
+        return jsonify(round(price * circulating_supply / 1e18))
+
+    elif route == RouteName.FDV:
+        return jsonify(round(price * total_supply / 1e18))
+
+    return jsonify(status='error', msg='Route not found'), 404
 
 
 if __name__ == '__main__':

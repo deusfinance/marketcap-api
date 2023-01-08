@@ -15,6 +15,17 @@ with open('abi.json') as fp:
 w3 = web3.Web3(web3.HTTPProvider(rpcs['fantom'][0]))
 
 
+class RouteName:
+    CIRCULATING_SUPPLY = 'circulating-supply'
+    TOTAL_SUPPLY = 'total-supply'
+    FDV = 'fdv'
+    MARKETCAP = 'marketcap'
+
+    @classmethod
+    def is_valid(cls, route):
+        return route in (cls.CIRCULATING_SUPPLY, cls.TOTAL_SUPPLY, cls.FDV, cls.MARKETCAP)
+
+
 def get_ftm_dex_price():
     ftm_fu_pair = w3.eth.contract(SPOOKY_USDC_FTM, abi=PAIR_ABI)
     usdc_reserve, ftm_reserve, _ = ftm_fu_pair.functions.getReserves().call()
