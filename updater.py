@@ -48,15 +48,15 @@ def xdeus_updator(managers):
         xmc = managers[chain].xmc
         print(f'{chain:.^40}')
         try:
-            if chain in xdeus_bridge_pools:
-                pool_supply = xdeus_contract.functions.balanceOf(xdeus_bridge_pools[chain]).call()
-            else:
-                pool_supply = 0
-            total_supply = xdeus_contract.functions.totalSupply().call() - pool_supply
-            if contracts:
-                nc_supply = sum(balance[0] for balance in xmc.balanceOf(set(contracts.values())))
-            else:
-                nc_supply = 0
+            # if chain in xdeus_bridge_pools:
+            #     pool_supply = xdeus_contract.functions.balanceOf(xdeus_bridge_pools[chain]).call()
+            # else:
+            #     pool_supply = 0
+            total_supply = xdeus_contract.functions.totalSupply().call()  # - pool_supply
+            # if contracts:
+            #     nc_supply = sum(balance[0] for balance in xmc.balanceOf(set(contracts.values())))
+            # else:
+            nc_supply = 0
             redis_client.set(X_NC_SUPPLY_REDIS_PREFIX + chain, nc_supply)
             redis_client.set(X_TOTAL_SUPPLY_REDIS_PREFIX + chain, total_supply)
         except Exception as ex:
