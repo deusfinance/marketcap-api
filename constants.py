@@ -40,10 +40,8 @@ bridge_pools = {
 xdeus_non_circulating_contracts = {
     'fantom': {
         'MasterChefV2': '0x62ad8dE6740314677F06723a7A07797aE5082Dbb',
-        'SwapFlashLoan': '0x54a5039C403fff8538fC582e0e3f07387B707381',
     },
     'mainnet': {
-        'SolidlyPair xDeus/Deus': '0x4EF3fF9dadBa30cff48133f5Dc780A28fc48693F',
     }
 }
 
