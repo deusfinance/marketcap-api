@@ -77,4 +77,4 @@ def get_circulating_supply(chain):
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(port=5152)
