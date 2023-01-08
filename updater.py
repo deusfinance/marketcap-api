@@ -2,7 +2,8 @@ import time
 
 from config import update_timeout, NC_SUPPLY_REDIS_PREFIX, PRICE_REDIS_TAG, TOTAL_SUPPLY_REDIS_PREFIX, \
     X_NC_SUPPLY_REDIS_PREFIX, X_TOTAL_SUPPLY_REDIS_PREFIX, X_PRICE_REDIS_TAG
-from constants import non_circulating_contracts, bridge_pools, xdeus_non_circulating_contracts, xdeus_bridge_pools
+from constants import non_circulating_contracts, bridge_pools, xdeus_non_circulating_contracts, xdeus_bridge_pools, \
+    veDEUS_ADDRESS
 from redis_client import redis_client
 
 from utils import RPCManager, deus_spooky, xdeus_price
@@ -19,7 +20,8 @@ def deus_updator(managers):
                 pool_supply = deus_contract.functions.balanceOf(bridge_pools[chain]).call()
             else:
                 pool_supply = 0
-            total_supply = deus_contract.functions.totalSupply().call() - pool_supply
+            ve_deus = deus_contract.functions.balanceOf(veDEUS_ADDRESS).call() if chain == 'fantom' else 0
+            total_supply = deus_contract.functions.totalSupply().call() - pool_supply - ve_deus
             if contracts:
                 nc_supply = sum(balance[0] for balance in mc.balanceOf(set(contracts.values())))
             else:
