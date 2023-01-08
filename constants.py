@@ -37,7 +37,25 @@ bridge_pools = {
     'mainnet': '0x5fd564518A71AAB9B1D0Ac6D5825bbBC46a5845e',
 }
 
+xdeus_non_circulating_contracts = {
+    'fantom': {
+        'MasterChefV2': '0x62ad8dE6740314677F06723a7A07797aE5082Dbb',
+        'SwapFlashLoan': '0x54a5039C403fff8538fC582e0e3f07387B707381',
+    },
+    'mainnet': {
+        'SolidlyPair xDeus/Deus': '0x4EF3fF9dadBa30cff48133f5Dc780A28fc48693F',
+    }
+}
+
+xdeus_bridge_pools = {
+    'fantom': '0x0cD61B1Bf6F8F2B6BA03cc8BCc57C941b7cC47a4',
+    'mainnet': '0x6Ed2b2ac055bd755c3A30Fb9c039922859CaA0ba',
+}
+
 PAIR_ABI = '[{"constant":true,"inputs":[],"name":"getReserves","outputs":[{"internalType":"uint112","name":"_reserve0","type":"uint112"},{"internalType":"uint112","name":"_reserve1","type":"uint112"},{"internalType":"uint32","name":"_blockTimestampLast","type":"uint32"}],"payable":false,"stateMutability":"view","type":"function"}]'
+XDEUS_POOL_ABI = '[{"inputs":[{"internalType":"uint8","name":"tokenIndexFrom","type":"uint8"},{"internalType":"uint8","name":"tokenIndexTo","type":"uint8"},{"internalType":"uint256","name":"dx","type":"uint256"}],"name":"calculateSwap","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}]'
 SPOOKY_USDC_FTM = '0x2b4C76d0dc16BE1C31D4C1DC53bF9B45987Fc75c'
 SPOOKY_FTM_DEUS = '0xaF918eF5b9f33231764A5557881E6D3e5277d456'
 DEUS_ADDRESS = '0xDE5ed76E7c05eC5e4572CfC88d1ACEA165109E44'
+XDEUS_ADDRESS = '0x953Cd009a490176FcEB3a26b9753e6F01645ff28'
+XDEUS_DEUS_POOL = '0x54a5039C403fff8538fC582e0e3f07387B707381'

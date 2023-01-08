@@ -5,7 +5,8 @@ import web3
 from multicallable import Multicallable
 from web3 import HTTPProvider
 
-from constants import DEUS_ADDRESS, SPOOKY_USDC_FTM, SPOOKY_FTM_DEUS, PAIR_ABI, non_circulating_contracts
+from constants import DEUS_ADDRESS, SPOOKY_USDC_FTM, SPOOKY_FTM_DEUS, PAIR_ABI, non_circulating_contracts, \
+    XDEUS_DEUS_POOL, XDEUS_POOL_ABI, XDEUS_ADDRESS, xdeus_non_circulating_contracts
 from config import rpcs
 
 with open('abi.json') as fp:
@@ -26,6 +27,17 @@ def deus_spooky():
     return (reserve_ftm / reserve_deus) * get_ftm_dex_price()
 
 
+def get_xdeus_ratio():
+    pool_contract = w3.eth.contract(XDEUS_DEUS_POOL, abi=XDEUS_POOL_ABI)
+    dx = 1_000_000
+    amount = pool_contract.functions.calculateSwap(0, 1, dx).call()
+    return round(amount / dx, 3)
+
+
+def xdeus_price():
+    return get_xdeus_ratio() * deus_spooky()
+
+
 class RPCManager:
     def __init__(self, chain_name: str):
         self.chain_name = chain_name
@@ -33,10 +45,15 @@ class RPCManager:
 
         w3 = self.get_w3()
         self.deus_contract = w3.eth.contract(DEUS_ADDRESS, abi=abi)
-        if non_circulating_contracts[chain_name]:
+        self.xdeus_contract = w3.eth.contract(XDEUS_ADDRESS, abi=abi)
+        if non_circulating_contracts.get(chain_name):
             self.mc = Multicallable(DEUS_ADDRESS, abi, w3)
         else:
             self.mc = None
+        if xdeus_non_circulating_contracts.get(chain_name):
+            self.xmc = Multicallable(XDEUS_ADDRESS, abi, w3)
+        else:
+            self.xmc = None
 
     def get_w3(self):
         for rpc in self.rpcs:
@@ -48,5 +65,8 @@ class RPCManager:
     def update_rpc(self):
         w3 = self.get_w3()
         self.deus_contract = w3.eth.contract(DEUS_ADDRESS, abi=abi)
+        self.xdeus_contract = w3.eth.contract(XDEUS_ADDRESS, abi=abi)
         if self.mc is not None:
             self.mc = Multicallable(DEUS_ADDRESS, abi, w3)
+        if self.xmc is not None:
+            self.xmc = Multicallable(XDEUS_ADDRESS, abi, w3)
