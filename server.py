@@ -163,14 +163,16 @@ def get_prices():
     prices = []
     for key in keys:
         value = price_db.get(key)
-        if value is None or value == 'N/A':
+        if value is None or value.decode() == 'N/A':
             price = 'N/A'
         else:
             price = str(round(int(value) / 1e6, 6))
         prices.append(price)
     for key in [RedisKey.DEUS_GATEIO, RedisKey.DEUS_MEXC]:
-        price = price_db.get(key) or 'N/A'
-        prices.append(price)
+        value = price_db.get(key)
+        if value is None or value.decode() == 'N/A':
+            value = 'N/A'
+        prices.append(value)
     deus = []
     dei = []
     legacy_dei = []
