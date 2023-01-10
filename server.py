@@ -134,7 +134,7 @@ def get_xdeus_deus_ratio():
 
 
 @app.route('/xdeus-deus/marketcap')
-def get_xdeus_deus_ratio():
+def get_xdeus_deus_marketcap():
     result = get_marketcap_info()
     deus_marketcap = int(result['result']['deus']['total']['marketCap'])
     xdeus_marketcap = int(result['result']['xdeus']['total']['marketCap'])
