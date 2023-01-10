@@ -15,15 +15,31 @@ with open('abi.json') as fp:
 w3 = web3.Web3(web3.HTTPProvider(rpcs['fantom'][0]))
 
 
+class RedisKey:
+    xDEUS_RATIO = 'xDEUS_RATIO'  # decimals 6
+    DEUS_SPOOKY = 'DEUS_SPOOKY'  # decimals 6
+    DEUS_SPIRIT = 'DEUS_SPIRIT'  # decimals 6
+    legacyDEI_SPOOKY = 'legacyDEI_SPOOKY'  # decimals 6
+    legacyDEI_SPIRIT = 'legacyDEI_SPIRIT'  # decimals 6
+    legacyDEI_SOLIDLY = 'legacyDEI_SOLIDLY'  # decimals 6
+    legacyDEI_BEETS = 'legacyDEI_BEETS'  # decimals 6
+    DEI_FIREBIRD = 'DEI_FIREBIRD'  # decimals 6
+    DEUS_GATEIO = 'DEUS_GATEIO'  # float
+    DEUS_MEXC = 'DEUS_MEXC'  # float
+    DEUS_SOLIDLY_ETH = 'DEUS_SOLIDLY_ETH'  # decimals 6
+    DEI_SOLIDLY_ETH = 'DEI_SOLIDLY_ETH'  # decimals 6
+
+
 class RouteName:
     CIRCULATING_SUPPLY = 'circulating-supply'
     TOTAL_SUPPLY = 'total-supply'
     FDV = 'fdv'
     MARKETCAP = 'marketcap'
+    PRICE = 'price'
 
     @classmethod
     def is_valid(cls, route):
-        return route in (cls.CIRCULATING_SUPPLY, cls.TOTAL_SUPPLY, cls.FDV, cls.MARKETCAP)
+        return route in (cls.CIRCULATING_SUPPLY, cls.TOTAL_SUPPLY, cls.FDV, cls.MARKETCAP, cls.PRICE)
 
 
 def get_ftm_dex_price():

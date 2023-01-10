@@ -4,7 +4,7 @@ from config import update_timeout, NC_SUPPLY_REDIS_PREFIX, PRICE_REDIS_TAG, TOTA
     X_NC_SUPPLY_REDIS_PREFIX, X_TOTAL_SUPPLY_REDIS_PREFIX, X_PRICE_REDIS_TAG
 from constants import non_circulating_contracts, bridge_pools, xdeus_non_circulating_contracts, xdeus_bridge_pools, \
     veDEUS_ADDRESS
-from redis_client import redis_client
+from redis_client import marketcap_db
 
 from utils import RPCManager, deus_spooky, xdeus_price
 
@@ -26,8 +26,8 @@ def deus_updator(managers):
                 nc_supply = sum(balance[0] for balance in mc.balanceOf(set(contracts.values())))
             else:
                 nc_supply = 0
-            redis_client.set(NC_SUPPLY_REDIS_PREFIX + chain, nc_supply)
-            redis_client.set(TOTAL_SUPPLY_REDIS_PREFIX + chain, total_supply)
+            marketcap_db.set(NC_SUPPLY_REDIS_PREFIX + chain, nc_supply)
+            marketcap_db.set(TOTAL_SUPPLY_REDIS_PREFIX + chain, total_supply)
         except Exception as ex:
             print('Error:', ex)
             managers[chain].update_rpc()
@@ -36,7 +36,7 @@ def deus_updator(managers):
             print('NON-CIRCULATING:', nc_supply)
     try:
         price = str(deus_spooky())
-        redis_client.set(PRICE_REDIS_TAG, price)
+        marketcap_db.set(PRICE_REDIS_TAG, price)
     except Exception as ex:
         print('Error:', ex)
     else:
@@ -59,8 +59,8 @@ def xdeus_updator(managers):
             #     nc_supply = sum(balance[0] for balance in xmc.balanceOf(set(contracts.values())))
             # else:
             nc_supply = 0
-            redis_client.set(X_NC_SUPPLY_REDIS_PREFIX + chain, nc_supply)
-            redis_client.set(X_TOTAL_SUPPLY_REDIS_PREFIX + chain, total_supply)
+            marketcap_db.set(X_NC_SUPPLY_REDIS_PREFIX + chain, nc_supply)
+            marketcap_db.set(X_TOTAL_SUPPLY_REDIS_PREFIX + chain, total_supply)
         except Exception as ex:
             print('Error:', ex)
             managers[chain].update_rpc()
@@ -69,7 +69,7 @@ def xdeus_updator(managers):
             print('NON-CIRCULATING:', nc_supply)
     try:
         price = str(xdeus_price())
-        redis_client.set(X_PRICE_REDIS_TAG, price)
+        marketcap_db.set(X_PRICE_REDIS_TAG, price)
     except Exception as ex:
         print('Error:', ex)
     else:
