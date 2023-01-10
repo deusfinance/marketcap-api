@@ -1,3 +1,5 @@
+import time
+
 from flask import Flask, jsonify
 
 from constants import non_circulating_contracts, xdeus_non_circulating_contracts
@@ -9,6 +11,15 @@ from utils import RouteName, RedisKey
 deus_chains = list(non_circulating_contracts)
 xdeus_chains = list(xdeus_non_circulating_contracts)
 app = Flask(__name__)
+
+
+def gradual_circulating_supply(actual_supply):
+    base = 122013000000000000000000
+    last_timestamp = 1674234000
+    now = int(time.time())
+    if now >= last_timestamp or actual_supply <= base:
+        return actual_supply
+    return base + int((actual_supply - base) * (1 - (((last_timestamp - now) // 360) / 2400)))
 
 
 def get_marketcap_info():
@@ -78,7 +89,8 @@ def get_deus_info(route):
         total_supply += supply
 
     if route == RouteName.CIRCULATING_SUPPLY:
-        return jsonify(round(circulating_supply))
+        gcs = gradual_circulating_supply(round(circulating_supply))
+        return jsonify(gcs)
 
     elif route == RouteName.TOTAL_SUPPLY:
         return jsonify(round(total_supply))
