@@ -54,7 +54,9 @@ def xdeus_updator(managers):
             #     pool_supply = xdeus_contract.functions.balanceOf(xdeus_bridge_pools[chain]).call()
             # else:
             #     pool_supply = 0
-            total_supply = xdeus_contract.functions.totalSupply().call()  # - pool_supply
+            msig_supply = xdeus_contract.functions.balanceOf(contracts['DEUS mSig']).call()
+            print('msig balance:', msig_supply)
+            total_supply = xdeus_contract.functions.totalSupply().call() - msig_supply
             # if contracts:
             #     nc_supply = sum(balance[0] for balance in xmc.balanceOf(set(contracts.values())))
             # else:
