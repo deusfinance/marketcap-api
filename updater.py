@@ -6,7 +6,7 @@ from constants import non_circulating_contracts, bridge_pools, xdeus_non_circula
     veDEUS_ADDRESS
 from redis_client import marketcap_db
 
-from utils import RPCManager, deus_spooky, xdeus_price
+from utils import RPCManager, deus_spooky, xdeus_price, get_xdeus_reward
 
 
 def deus_updator(managers):
@@ -56,7 +56,9 @@ def xdeus_updator(managers):
             #     pool_supply = 0
             msig_supply = xdeus_contract.functions.balanceOf(contracts['DEUS mSig']).call()
             print('msig balance:', msig_supply)
-            total_supply = xdeus_contract.functions.totalSupply().call() - msig_supply
+            reward = get_xdeus_reward(xdeus_contract)
+            print('Reward:', reward)
+            total_supply = xdeus_contract.functions.totalSupply().call() - msig_supply - reward
             # if contracts:
             #     nc_supply = sum(balance[0] for balance in xmc.balanceOf(set(contracts.values())))
             # else:

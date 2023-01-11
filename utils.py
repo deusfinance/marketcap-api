@@ -6,13 +6,14 @@ from multicallable import Multicallable
 from web3 import HTTPProvider
 
 from constants import DEUS_ADDRESS, SPOOKY_USDC_FTM, SPOOKY_FTM_DEUS, PAIR_ABI, non_circulating_contracts, \
-    XDEUS_DEUS_POOL, XDEUS_POOL_ABI, XDEUS_ADDRESS, xdeus_non_circulating_contracts
+    XDEUS_DEUS_POOL, XDEUS_POOL_ABI, XDEUS_ADDRESS, xdeus_non_circulating_contracts, MASTERCHEF_XDEUS, MASTERCHEF_ABI
 from config import rpcs
 
 with open('abi.json') as fp:
     abi = json.load(fp)
 
 w3 = web3.Web3(web3.HTTPProvider(rpcs['fantom'][0]))
+masterchef_contract = w3.eth.contract(w3.toChecksumAddress(MASTERCHEF_XDEUS), abi=MASTERCHEF_ABI)
 
 
 class RedisKey:
@@ -40,6 +41,12 @@ class RouteName:
     @classmethod
     def is_valid(cls, route):
         return route in (cls.CIRCULATING_SUPPLY, cls.TOTAL_SUPPLY, cls.FDV, cls.MARKETCAP, cls.PRICE)
+
+
+def get_xdeus_reward(xdeus_contract):
+    tda = masterchef_contract.functions.totalDepositedAmount(0).call()
+    reward = xdeus_contract.functions.balanceOf(MASTERCHEF_XDEUS).call() - tda
+    return max(reward, 0)
 
 
 def get_ftm_dex_price():
