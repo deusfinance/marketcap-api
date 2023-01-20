@@ -89,8 +89,8 @@ def get_deus_info(route):
         total_supply += supply
 
     if route == RouteName.CIRCULATING_SUPPLY:
-        gcs = gradual_circulating_supply(round(circulating_supply))
-        return jsonify(gcs)
+        # gcs = gradual_circulating_supply(round(circulating_supply))
+        return jsonify(round(circulating_supply))
 
     elif route == RouteName.TOTAL_SUPPLY:
         return jsonify(round(total_supply))
