@@ -157,9 +157,9 @@ def get_xdeus_deus_marketcap():
 def get_tvl():
     deus_price = float(marketcap_db.get(PRICE_REDIS_TAG))
     xdeus_price = float(marketcap_db.get(X_PRICE_REDIS_TAG))
-    xdeus_deus_tvl_ftm = round(marketcap_db.get(xDD_TL_FTM) * deus_price)
-    xdeus_tvl_ftm = round(marketcap_db.get(xD_TL_FTM) * xdeus_price)
-    xdeus_deus_tvl_eth = round(marketcap_db.get(xDD_TL_ETH) * deus_price)
+    xdeus_deus_tvl_ftm = round(int(marketcap_db.get(xDD_TL_FTM)) * deus_price)
+    xdeus_tvl_ftm = round(int(marketcap_db.get(xD_TL_FTM)) * xdeus_price)
+    xdeus_deus_tvl_eth = round(int(marketcap_db.get(xDD_TL_ETH)) * deus_price)
     return jsonify(fantom={'xDEUS-DEUS': xdeus_deus_tvl_ftm, 'xDEUS': xdeus_tvl_ftm},
                    mainnet={'xDEUS-DEUS': xdeus_deus_tvl_eth})
 
