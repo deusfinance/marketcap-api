@@ -4,7 +4,7 @@ from flask import Flask, jsonify
 
 from constants import non_circulating_contracts, xdeus_non_circulating_contracts
 from config import PRICE_REDIS_TAG, NC_SUPPLY_REDIS_PREFIX, TOTAL_SUPPLY_REDIS_PREFIX, X_NC_SUPPLY_REDIS_PREFIX, \
-    X_TOTAL_SUPPLY_REDIS_PREFIX, X_PRICE_REDIS_TAG
+    X_TOTAL_SUPPLY_REDIS_PREFIX, X_PRICE_REDIS_TAG, xDD_TL_FTM, xD_TL_FTM, xDD_TL_ETH
 from redis_client import marketcap_db, price_db
 from utils import RouteName, RedisKey
 
@@ -151,6 +151,17 @@ def get_xdeus_deus_marketcap():
     deus_marketcap = int(result['result']['deus']['total']['marketCap'])
     xdeus_marketcap = int(result['result']['xdeus']['total']['marketCap'])
     return jsonify(deus_marketcap + xdeus_marketcap)
+
+
+@app.route('/tvl')
+def get_tvl():
+    deus_price = float(marketcap_db.get(PRICE_REDIS_TAG))
+    xdeus_price = float(marketcap_db.get(X_PRICE_REDIS_TAG))
+    xdeus_deus_tvl_ftm = round(marketcap_db.get(xDD_TL_FTM) * deus_price)
+    xdeus_tvl_ftm = round(marketcap_db.get(xD_TL_FTM) * xdeus_price)
+    xdeus_deus_tvl_eth = round(marketcap_db.get(xDD_TL_ETH) * deus_price)
+    return jsonify(fantom={'xDEUS-DEUS': xdeus_deus_tvl_ftm, 'xDEUS': xdeus_tvl_ftm},
+                   mainnet={'xDEUS-DEUS': xdeus_deus_tvl_eth})
 
 
 @app.route('/dei/price')

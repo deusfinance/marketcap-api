@@ -6,7 +6,8 @@ from multicallable import Multicallable
 from web3 import HTTPProvider
 
 from constants import DEUS_ADDRESS, SPOOKY_USDC_FTM, SPOOKY_FTM_DEUS, PAIR_ABI, non_circulating_contracts, \
-    XDEUS_DEUS_POOL, XDEUS_POOL_ABI, XDEUS_ADDRESS, xdeus_non_circulating_contracts, MASTERCHEF_XDEUS, MASTERCHEF_ABI
+    XDEUS_DEUS_POOL, XDEUS_POOL_ABI, XDEUS_ADDRESS, xdeus_non_circulating_contracts, MASTERCHEF_XDEUS, MASTERCHEF_ABI, \
+    XDEUS_DEUS_SOLIDLY
 from config import rpcs
 
 with open('abi.json') as fp:
@@ -14,6 +15,7 @@ with open('abi.json') as fp:
 
 w3 = web3.Web3(web3.HTTPProvider(rpcs['fantom'][0]))
 masterchef_contract = w3.eth.contract(w3.toChecksumAddress(MASTERCHEF_XDEUS), abi=MASTERCHEF_ABI)
+deus_contract = w3.eth.contract(DEUS_ADDRESS, abi=PAIR_ABI)
 
 
 class RedisKey:
@@ -41,6 +43,17 @@ class RouteName:
     @classmethod
     def is_valid(cls, route):
         return route in (cls.CIRCULATING_SUPPLY, cls.TOTAL_SUPPLY, cls.FDV, cls.MARKETCAP, cls.PRICE)
+
+
+# get total lock
+def get_tl(deus_ftm, deus_eth):
+    tl_xdd_ftm = deus_ftm.functions.balanceOf(XDEUS_DEUS_POOL).call() * 2
+    tl_xd_ftm = masterchef_contract.functions.totalDepositedAmount(0).call()
+    tl_xdd_eth = deus_eth.functions.balanceOf(XDEUS_DEUS_SOLIDLY).call() * 2
+    tl_xdd_ftm = round(tl_xdd_ftm / 1e18)
+    tl_xd_ftm = round(tl_xd_ftm / 1e18)
+    tl_xdd_eth = round(tl_xdd_eth / 1e18)
+    return tl_xdd_ftm, tl_xd_ftm, tl_xdd_eth
 
 
 def get_xdeus_reward(xdeus_contract):

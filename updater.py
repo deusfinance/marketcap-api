@@ -1,14 +1,28 @@
 import time
 
 from config import update_timeout, NC_SUPPLY_REDIS_PREFIX, PRICE_REDIS_TAG, TOTAL_SUPPLY_REDIS_PREFIX, \
-    X_NC_SUPPLY_REDIS_PREFIX, X_TOTAL_SUPPLY_REDIS_PREFIX, X_PRICE_REDIS_TAG
+    X_NC_SUPPLY_REDIS_PREFIX, X_TOTAL_SUPPLY_REDIS_PREFIX, X_PRICE_REDIS_TAG, xDD_TL_FTM, xD_TL_FTM, xDD_TL_ETH
 from constants import non_circulating_contracts, bridge_pools, xdeus_non_circulating_contracts, xdeus_bridge_pools, \
     veDEUS_ADDRESS
 from redis_client import marketcap_db
 
-from utils import RPCManager, deus_spooky, xdeus_price, get_xdeus_reward
+from utils import RPCManager, deus_spooky, xdeus_price, get_xdeus_reward, get_tl
 
 
+def handle_error(func):
+    def new_func(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except KeyboardInterrupt:
+            raise
+        except Exception as ex:
+            print(f'Error on `{func.__name__}`:', ex)
+
+    new_func.__name__ = func.__name__
+    return new_func
+
+
+@handle_error
 def deus_updator(managers):
     print('***** DEUS *****')
     for chain, contracts in non_circulating_contracts.items():
@@ -43,6 +57,7 @@ def deus_updator(managers):
         print(f'\n*** DEUS PRICE ***\n{price}\n')
 
 
+@handle_error
 def xdeus_updator(managers):
     print('***** xDEUS *****')
     for chain, contracts in xdeus_non_circulating_contracts.items():
@@ -80,6 +95,18 @@ def xdeus_updator(managers):
         print(f'\n*** xDEUS PRICE ***\n{price}\n')
 
 
+@handle_error
+def tl_updator(managers):
+    print('***** Total Lock *****')
+    tl_xdd_ftm, tl_xd_ftm, tl_xdd_eth = get_tl(managers['fantom'].deus_contract, managers['mainnet'].deus_contract)
+    print('TL xDEUS/DEUS ftm:', tl_xdd_ftm)
+    print('TL xDEUS ftm:     ', tl_xd_ftm)
+    print('TL xDEUS/DEUS eth:', tl_xdd_eth)
+    marketcap_db.set(xDD_TL_FTM, tl_xdd_ftm)
+    marketcap_db.set(xD_TL_FTM, tl_xd_ftm)
+    marketcap_db.set(xDD_TL_ETH, tl_xdd_eth)
+
+
 def run_updator():
     managers = {}
     for chain, _ in non_circulating_contracts.items():
@@ -89,10 +116,9 @@ def run_updator():
         try:
             deus_updator(managers)
             xdeus_updator(managers)
+            tl_updator(managers)
         except KeyboardInterrupt:
             break
-        except Exception as ex:
-            print('Error:', ex)
         time.sleep(update_timeout)
 
 
