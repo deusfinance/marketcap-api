@@ -36,13 +36,14 @@ class RedisKey:
 class RouteName:
     CIRCULATING_SUPPLY = 'circulating-supply'
     TOTAL_SUPPLY = 'total-supply'
+    NON_CIRCULATING_SUPPLY = 'non-circulating-supply'
     FDV = 'fdv'
     MARKETCAP = 'marketcap'
     PRICE = 'price'
 
     @classmethod
     def is_valid(cls, route):
-        return route in (cls.CIRCULATING_SUPPLY, cls.TOTAL_SUPPLY, cls.FDV, cls.MARKETCAP, cls.PRICE)
+        return route in (cls.CIRCULATING_SUPPLY, cls.NON_CIRCULATING_SUPPLY, cls.TOTAL_SUPPLY, cls.FDV, cls.MARKETCAP, cls.PRICE)
 
 
 # get total lock
