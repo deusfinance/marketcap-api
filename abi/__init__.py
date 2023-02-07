@@ -14,3 +14,6 @@ with open('pair.json') as fp:
 
 with open('swap_flashloan.json') as fp:
     SWAP_FLASHLOAN_ABI = json.load(fp)
+
+with open('masterchef_helper.json') as fp:
+    MASTERCHEF_HELPER_ABI = json.load(fp)

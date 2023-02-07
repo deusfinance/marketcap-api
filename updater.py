@@ -1,12 +1,12 @@
 import time
 
-from config import CHAIN_TOTAL_SUPPLY_REDIS_PREFIX, SUPPLY_IN_BRIDGE_CONTRACTS_REDIS_PREFIX, SUPPLY_IN_VEDEUS_CONTRACT_REDIS_PREFIX, X_CHAIN_TOTAL_SUPPLY_REDIS_PREFIX, X_SUPPLY_IN_BRIDGE_CONTRACTS_REDIS_PREFIX, update_timeout, NC_SUPPLY_REDIS_PREFIX, PRICE_REDIS_TAG, TOTAL_SUPPLY_REDIS_PREFIX, \
-    X_NC_SUPPLY_REDIS_PREFIX, X_TOTAL_SUPPLY_REDIS_PREFIX, X_PRICE_REDIS_TAG, xDD_TL_FTM, xD_TL_FTM, xDD_TL_ETH
+from config import update_timeout
 from constants import non_circulating_contracts, bridge_pools, xdeus_non_circulating_contracts, xdeus_bridge_pools, \
     veDEUS_ADDRESS
 from redis_client import marketcap_db
 
-from utils import RPCManager, deus_spooky, xdeus_price, get_xdeus_reward, get_tl
+from utils import RPCManager, deus_spooky, xdeus_price, get_xdeus_reward, get_tl, DataRedisKey, get_tvl, \
+    get_alloc_point, get_reward_per_second
 
 
 def handle_error(func):
@@ -41,11 +41,11 @@ def deus_updator(managers):
                 nc_supply = sum(balance[0] for balance in mc.balanceOf(set(contracts.values())))
             else:
                 nc_supply = 0
-            marketcap_db.set(CHAIN_TOTAL_SUPPLY_REDIS_PREFIX + chain, chain_total_supply)
-            marketcap_db.set(SUPPLY_IN_BRIDGE_CONTRACTS_REDIS_PREFIX + chain, pool_supply)
-            marketcap_db.set(SUPPLY_IN_VEDEUS_CONTRACT_REDIS_PREFIX + chain, ve_deus)
-            marketcap_db.set(NC_SUPPLY_REDIS_PREFIX + chain, nc_supply)
-            marketcap_db.set(TOTAL_SUPPLY_REDIS_PREFIX + chain, total_supply)
+            marketcap_db.set(DataRedisKey.CHAIN_TOTAL_SUPPLY + chain, chain_total_supply)
+            marketcap_db.set(DataRedisKey.SUPPLY_IN_BRIDGE_CONTRACTS + chain, pool_supply)
+            marketcap_db.set(DataRedisKey.SUPPLY_IN_VEDEUS_CONTRACT + chain, ve_deus)
+            marketcap_db.set(DataRedisKey.NC_SUPPLY + chain, nc_supply)
+            marketcap_db.set(DataRedisKey.TOTAL_SUPPLY + chain, total_supply)
         except Exception as ex:
             print('Error:', ex)
             managers[chain].update_rpc()
@@ -55,7 +55,7 @@ def deus_updator(managers):
             print('CIRCULATING:', total_supply - nc_supply)
     try:
         price = str(deus_spooky())
-        marketcap_db.set(PRICE_REDIS_TAG, price)
+        marketcap_db.set(DataRedisKey.PRICE_TAG, price)
     except Exception as ex:
         print('Error:', ex)
     else:
@@ -85,10 +85,10 @@ def xdeus_updator(managers):
             # if contracts:
             #     nc_supply = sum(balance[0] for balance in xmc.balanceOf(set(contracts.values())))
             # else:
-            marketcap_db.set(X_NC_SUPPLY_REDIS_PREFIX + chain, nc_supply)
-            marketcap_db.set(X_TOTAL_SUPPLY_REDIS_PREFIX + chain, supply)
-            marketcap_db.set(X_CHAIN_TOTAL_SUPPLY_REDIS_PREFIX + chain, chain_total_supply)
-            marketcap_db.set(X_SUPPLY_IN_BRIDGE_CONTRACTS_REDIS_PREFIX + chain, pool_supply)
+            marketcap_db.set(DataRedisKey.X_NC_SUPPLY + chain, nc_supply)
+            marketcap_db.set(DataRedisKey.X_TOTAL_SUPPLY + chain, supply)
+            marketcap_db.set(DataRedisKey.X_CHAIN_TOTAL_SUPPLY + chain, chain_total_supply)
+            marketcap_db.set(DataRedisKey.X_SUPPLY_IN_BRIDGE_CONTRACTS + chain, pool_supply)
         except Exception as ex:
             print('Error:', ex)
             managers[chain].update_rpc()
@@ -99,7 +99,7 @@ def xdeus_updator(managers):
             print('CIRCULATING:', circulating_supply)
     try:
         price = str(xdeus_price())
-        marketcap_db.set(X_PRICE_REDIS_TAG, price)
+        marketcap_db.set(DataRedisKey.X_PRICE_TAG, price)
     except Exception as ex:
         print('Error:', ex)
     else:
@@ -113,9 +113,14 @@ def tl_updator(managers):
     print('TL xDEUS/DEUS ftm:', tl_xdd_ftm)
     print('TL xDEUS ftm:     ', tl_xd_ftm)
     print('TL xDEUS/DEUS eth:', tl_xdd_eth)
-    marketcap_db.set(xDD_TL_FTM, tl_xdd_ftm)
-    marketcap_db.set(xD_TL_FTM, tl_xd_ftm)
-    marketcap_db.set(xDD_TL_ETH, tl_xdd_eth)
+    marketcap_db.set(DataRedisKey.xDD_TL_FTM, tl_xdd_ftm)
+    marketcap_db.set(DataRedisKey.xD_TL_FTM, tl_xd_ftm)
+    marketcap_db.set(DataRedisKey.xDD_TL_ETH, tl_xdd_eth)
+
+
+@handle_error
+def tvl_():
+    tvl_xdeus0, tvl_xdeus2, tvl_spooky0, tvl_spooky2, tvl_beets, tvl_bdei0, tvl_bdei1 = get_tvl()
 
 
 def run_updator():

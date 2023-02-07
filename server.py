@@ -3,10 +3,8 @@ import time
 from flask import Flask, jsonify
 
 from constants import non_circulating_contracts, xdeus_non_circulating_contracts
-from config import CHAIN_TOTAL_SUPPLY_REDIS_PREFIX, PRICE_REDIS_TAG, NC_SUPPLY_REDIS_PREFIX, SUPPLY_IN_BRIDGE_CONTRACTS_REDIS_PREFIX, SUPPLY_IN_VEDEUS_CONTRACT_REDIS_PREFIX, TOTAL_SUPPLY_REDIS_PREFIX, X_CHAIN_TOTAL_SUPPLY_REDIS_PREFIX, X_NC_SUPPLY_REDIS_PREFIX, X_SUPPLY_IN_BRIDGE_CONTRACTS_REDIS_PREFIX, \
-    X_TOTAL_SUPPLY_REDIS_PREFIX, X_PRICE_REDIS_TAG, xDD_TL_FTM, xD_TL_FTM, xDD_TL_ETH
 from redis_client import marketcap_db, price_db
-from utils import RouteName, RedisKey
+from utils import RouteName, PriceRedisKey, DataRedisKey
 
 deus_chains = list(non_circulating_contracts)
 xdeus_chains = list(xdeus_non_circulating_contracts)
@@ -23,8 +21,8 @@ def gradual_circulating_supply(actual_supply):
 
 
 def get_marketcap_info():
-    deus_price = float(marketcap_db.get(PRICE_REDIS_TAG))
-    xdeus_price = float(marketcap_db.get(X_PRICE_REDIS_TAG))
+    deus_price = float(marketcap_db.get(DataRedisKey.PRICE_TAG))
+    xdeus_price = float(marketcap_db.get(DataRedisKey.X_PRICE_TAG))
     result = dict(price=dict(deus=str(deus_price), xdeus=str(xdeus_price)), result={})
     totalAmounts = dict(totalSupply=0,
                         totalSupplyOnChain=0,
@@ -36,11 +34,11 @@ def get_marketcap_info():
                         marketCap=0)
     deus = {}
     for chain in deus_chains:
-        supply = int(marketcap_db.get(TOTAL_SUPPLY_REDIS_PREFIX + chain))
-        chain_total_supply = int(marketcap_db.get(CHAIN_TOTAL_SUPPLY_REDIS_PREFIX + chain))
-        supply_in_bridges = int(marketcap_db.get( SUPPLY_IN_BRIDGE_CONTRACTS_REDIS_PREFIX + chain))
-        supply_in_vedeus = int(marketcap_db.get(SUPPLY_IN_VEDEUS_CONTRACT_REDIS_PREFIX + chain))
-        non_circulating_supply = int(marketcap_db.get(NC_SUPPLY_REDIS_PREFIX + chain))
+        supply = int(marketcap_db.get(DataRedisKey.TOTAL_SUPPLY + chain))
+        chain_total_supply = int(marketcap_db.get(DataRedisKey.CHAIN_TOTAL_SUPPLY + chain))
+        supply_in_bridges = int(marketcap_db.get(DataRedisKey.SUPPLY_IN_BRIDGE_CONTRACTS + chain))
+        supply_in_vedeus = int(marketcap_db.get(DataRedisKey.SUPPLY_IN_VEDEUS_CONTRACT + chain))
+        non_circulating_supply = int(marketcap_db.get(DataRedisKey.NC_SUPPLY + chain))
         circulating_supply = supply - non_circulating_supply
         fdv = round(supply * deus_price / 1e18)
         market_cap = round(circulating_supply * deus_price / 1e18)
@@ -53,9 +51,9 @@ def get_marketcap_info():
                            FDV=str(fdv),
                            marketCap=str(market_cap))
         totalAmounts['totalSupplyOnChain'] += chain_total_supply
-        totalAmounts['supplyInBridges'] += supply_in_bridges    
+        totalAmounts['supplyInBridges'] += supply_in_bridges
         totalAmounts['supplyInVeDeusContract'] += supply_in_vedeus
-        totalAmounts['nonCirculatingSupply'] += non_circulating_supply                          
+        totalAmounts['nonCirculatingSupply'] += non_circulating_supply
         totalAmounts['totalSupply'] += supply
         totalAmounts['circulatingSupply'] += circulating_supply
         totalAmounts['FDV'] += fdv
@@ -71,10 +69,10 @@ def get_marketcap_info():
                         marketCap=0)
     xdeus = {}
     for chain in xdeus_chains:
-        supply = int(marketcap_db.get(X_TOTAL_SUPPLY_REDIS_PREFIX + chain))
-        chain_total_supply = int(marketcap_db.get(X_CHAIN_TOTAL_SUPPLY_REDIS_PREFIX + chain))
-        supply_in_bridges = int(marketcap_db.get(X_SUPPLY_IN_BRIDGE_CONTRACTS_REDIS_PREFIX + chain))
-        non_circulating_supply = int(marketcap_db.get(X_NC_SUPPLY_REDIS_PREFIX + chain))
+        supply = int(marketcap_db.get(DataRedisKey.X_TOTAL_SUPPLY + chain))
+        chain_total_supply = int(marketcap_db.get(DataRedisKey.X_CHAIN_TOTAL_SUPPLY + chain))
+        supply_in_bridges = int(marketcap_db.get(DataRedisKey.X_SUPPLY_IN_BRIDGE_CONTRACTS + chain))
+        non_circulating_supply = int(marketcap_db.get(DataRedisKey.X_NC_SUPPLY + chain))
         circulating_supply = supply - non_circulating_supply
         fdv = round(supply * xdeus_price / 1e18)
         market_cap = round(circulating_supply * xdeus_price / 1e18)
@@ -86,7 +84,7 @@ def get_marketcap_info():
                             FDV=str(fdv),
                             marketCap=str(market_cap))
         totalAmounts['totalSupplyOnChain'] += chain_total_supply
-        totalAmounts['supplyInBridges'] += supply_in_bridges  
+        totalAmounts['supplyInBridges'] += supply_in_bridges
         totalAmounts['totalSupply'] += supply
         totalAmounts['nonCirculatingSupply'] += non_circulating_supply
         totalAmounts['circulatingSupply'] += circulating_supply
@@ -111,10 +109,10 @@ def get_deus_info(route):
     total_supply = 0
     circulating_supply = 0
     non_circulating_supply = 0
-    price = float(marketcap_db.get(PRICE_REDIS_TAG))
+    price = float(marketcap_db.get(DataRedisKey.PRICE_TAG))
     for chain in deus_chains:
-        supply = int(marketcap_db.get(TOTAL_SUPPLY_REDIS_PREFIX + chain))
-        nc_supply = int(marketcap_db.get(NC_SUPPLY_REDIS_PREFIX + chain))
+        supply = int(marketcap_db.get(DataRedisKey.TOTAL_SUPPLY + chain))
+        nc_supply = int(marketcap_db.get(DataRedisKey.NC_SUPPLY + chain))
         circulating_supply += supply - nc_supply
         non_circulating_supply += nc_supply
         total_supply += supply
@@ -136,7 +134,7 @@ def get_deus_info(route):
         return jsonify(round(price * total_supply / 1e18))
 
     elif route == RouteName.PRICE:
-        deus_price = float(marketcap_db.get(PRICE_REDIS_TAG))
+        deus_price = float(marketcap_db.get(DataRedisKey.PRICE_TAG))
         return jsonify(deus_price)
 
     return jsonify(status='error', msg='Route not found'), 404
@@ -149,10 +147,10 @@ def get_xdeus_info(route):
     total_supply = 0
     circulating_supply = 0
     non_circulating_supply = 0
-    price = float(marketcap_db.get(X_PRICE_REDIS_TAG))
+    price = float(marketcap_db.get(DataRedisKey.X_PRICE_TAG))
     for chain in xdeus_chains:
-        supply = int(marketcap_db.get(X_TOTAL_SUPPLY_REDIS_PREFIX + chain))
-        ncSupply = int(marketcap_db.get(X_NC_SUPPLY_REDIS_PREFIX + chain))
+        supply = int(marketcap_db.get(DataRedisKey.X_TOTAL_SUPPLY + chain))
+        ncSupply = int(marketcap_db.get(DataRedisKey.X_NC_SUPPLY + chain))
         circulating_supply += supply - ncSupply
         non_circulating_supply += ncSupply
         total_supply += supply
@@ -173,7 +171,7 @@ def get_xdeus_info(route):
         return jsonify(round(price * total_supply / 1e18))
 
     elif route == RouteName.PRICE:
-        xdeus_price = float(marketcap_db.get(X_PRICE_REDIS_TAG))
+        xdeus_price = float(marketcap_db.get(DataRedisKey.X_PRICE_TAG))
         return jsonify(xdeus_price)
 
     return jsonify(status='error', msg='Route not found'), 404
@@ -181,7 +179,7 @@ def get_xdeus_info(route):
 
 @app.route('/xdeus-deus/ratio')
 def get_xdeus_deus_ratio():
-    ratio = round(int(price_db.get(RedisKey.xDEUS_RATIO)) / 1e6, 3)
+    ratio = round(int(price_db.get(PriceRedisKey.xDEUS_RATIO)) / 1e6, 3)
     return jsonify(ratio)
 
 
@@ -195,33 +193,33 @@ def get_xdeus_deus_marketcap():
 
 @app.route('/tvl')
 def get_tvl():
-    deus_price = float(marketcap_db.get(PRICE_REDIS_TAG))
-    xdeus_price = float(marketcap_db.get(X_PRICE_REDIS_TAG))
-    xdeus_deus_tvl_ftm = round(int(marketcap_db.get(xDD_TL_FTM)) * deus_price)
-    xdeus_tvl_ftm = round(int(marketcap_db.get(xD_TL_FTM)) * xdeus_price)
-    xdeus_deus_tvl_eth = round(int(marketcap_db.get(xDD_TL_ETH)) * deus_price)
+    deus_price = float(marketcap_db.get(DataRedisKey.PRICE_TAG))
+    xdeus_price = float(marketcap_db.get(DataRedisKey.X_PRICE_TAG))
+    xdeus_deus_tvl_ftm = round(int(marketcap_db.get(DataRedisKey.xDD_TL_FTM)) * deus_price)
+    xdeus_tvl_ftm = round(int(marketcap_db.get(DataRedisKey.xD_TL_FTM)) * xdeus_price)
+    xdeus_deus_tvl_eth = round(int(marketcap_db.get(DataRedisKey.xDD_TL_ETH)) * deus_price)
     return jsonify(fantom={'xDEUS-DEUS': xdeus_deus_tvl_ftm, 'xDEUS': xdeus_tvl_ftm},
                    mainnet={'xDEUS-DEUS': xdeus_deus_tvl_eth})
 
 
 @app.route('/dei/price')
 def get_dei_price():
-    price = round(int(price_db.get(RedisKey.DEI_FIREBIRD)) / 1e6, 3)
+    price = round(int(price_db.get(PriceRedisKey.DEI_FIREBIRD)) / 1e6, 3)
     return jsonify(price)
 
 
 @app.route('/getPrices')
 def get_prices():
     keys = [
-        RedisKey.DEUS_SPOOKY,
-        RedisKey.DEUS_SPIRIT,
-        RedisKey.DEUS_SOLIDLY_ETH,
-        RedisKey.DEI_FIREBIRD,
-        RedisKey.DEI_SOLIDLY_ETH,
-        RedisKey.legacyDEI_SPOOKY,
-        RedisKey.legacyDEI_SPIRIT,
-        RedisKey.legacyDEI_SOLIDLY,
-        RedisKey.legacyDEI_BEETS,
+        PriceRedisKey.DEUS_SPOOKY,
+        PriceRedisKey.DEUS_SPIRIT,
+        PriceRedisKey.DEUS_SOLIDLY_ETH,
+        PriceRedisKey.DEI_FIREBIRD,
+        PriceRedisKey.DEI_SOLIDLY_ETH,
+        PriceRedisKey.legacyDEI_SPOOKY,
+        PriceRedisKey.legacyDEI_SPIRIT,
+        PriceRedisKey.legacyDEI_SOLIDLY,
+        PriceRedisKey.legacyDEI_BEETS,
     ]
     prices = []
     for key in keys:
@@ -231,7 +229,7 @@ def get_prices():
         else:
             price = str(round(int(value) / 1e6, 6))
         prices.append(price)
-    for key in [RedisKey.DEUS_GATEIO, RedisKey.DEUS_MEXC]:
+    for key in [PriceRedisKey.DEUS_GATEIO, PriceRedisKey.DEUS_MEXC]:
         value = price_db.get(key)
         if value:
             price = value.decode()

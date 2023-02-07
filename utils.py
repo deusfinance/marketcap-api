@@ -1,4 +1,3 @@
-import json
 from collections import deque
 
 import web3
@@ -6,16 +5,18 @@ from multicallable import Multicallable
 from web3 import HTTPProvider
 from web3.contract import Contract
 
-from abi import ERC20_ABI, MASTERCHEF_XDEUS_ABI, PAIR_ABI, SWAP_FLASHLOAN_ABI
+from abi import ERC20_ABI, MASTERCHEF_XDEUS_ABI, PAIR_ABI, SWAP_FLASHLOAN_ABI, MASTERCHEF_HELPER_ABI
 from constants import DEUS_ADDRESS, SPOOKY_USDC_FTM, SPOOKY_FTM_DEUS, non_circulating_contracts, XDEUS_DEUS_POOL, \
-    XDEUS_ADDRESS, xdeus_non_circulating_contracts, MASTERCHEF_XDEUS, XDEUS_DEUS_SOLIDLY
+    XDEUS_ADDRESS, xdeus_non_circulating_contracts, MASTERCHEF_XDEUS, XDEUS_DEUS_SOLIDLY, MASTERCHEF_HELPER
 from config import rpcs
+from redis_client import price_db
 
 w3 = web3.Web3(web3.HTTPProvider(rpcs['fantom'][0]))
 masterchef_contract = w3.eth.contract(w3.toChecksumAddress(MASTERCHEF_XDEUS), abi=MASTERCHEF_XDEUS_ABI)
+mc_helper = w3.eth.contract(MASTERCHEF_HELPER, abi=MASTERCHEF_HELPER_ABI)
 
 
-class RedisKey:
+class PriceRedisKey:
     xDEUS_RATIO = 'xDEUS_RATIO'  # decimals 6
     DEUS_SPOOKY = 'DEUS_SPOOKY'  # decimals 6
     DEUS_SPIRIT = 'DEUS_SPIRIT'  # decimals 6
@@ -30,6 +31,46 @@ class RedisKey:
     DEI_SOLIDLY_ETH = 'DEI_SOLIDLY_ETH'  # decimals 6
 
 
+class DataRedisKey:
+    CHAIN_TOTAL_SUPPLY = 'CHAIN_TOTAL_SUPPLY_'
+    SUPPLY_IN_BRIDGE_CONTRACTS = 'SUPPLY_IN_BRIDGE_CONTRACTS_'
+    SUPPLY_IN_VEDEUS_CONTRACT = 'SUPPLY_IN_VEDEUS_CONTRACT_'
+    NC_SUPPLY = 'NON_CIRCULATING_SUPPLY_'
+    TOTAL_SUPPLY = 'TOTAL_SUPPLY_'
+    X_NC_SUPPLY = 'X_NON_CIRCULATING_SUPPLY_'
+    X_CHAIN_TOTAL_SUPPLY = 'X_CHAIN_TOTAL_SUPPLY_'
+    X_TOTAL_SUPPLY = 'X_TOTAL_SUPPLY_'
+    X_SUPPLY_IN_BRIDGE_CONTRACTS = 'X_SUPPLY_IN_BRIDGE_CONTRACTS_'
+
+    PRICE_TAG = 'DEUS_PRICE'
+    X_PRICE_TAG = 'XDEUS_PRICE'
+
+    xDD_TL_FTM = 'xDD_TL_FTM'  # decimals 18
+    xD_TL_FTM = 'xD_TL_FTM'  # decimals 18
+    xDD_TL_ETH = 'xDD_TL_ETH'  # decimals 18
+
+    TVL_SINGLE_XDEUS = 'TVL_SINGLE_XDEUS'
+    TVL_XDEUS_DEUS = 'TVL_XDEUS_DEUS'
+    TVL_LP_DEUS_FTM = 'TVL_LP_DEUS_FTM'
+    TVL_LP_DEI_USDC = 'TVL_LP_DEI_USDC'
+    TVL_BEETS_DEI_USDC = 'TVL_BEETS_DEI_USDC'
+    TVL_SINGLE_BDEI = 'TVL_SINGLE_BDEI'
+    TVL_DEI_BDEI = 'TVL_DEI_BDEI'
+
+    RPS_XDEUS = 'RPS_MASTERCHEF_XDEUS'
+    RPS_SPOOKY = 'RPS_MASTERCHEF_SPOOKY'
+    RPS_BEETS = 'RPS_MASTERCHEF_BEETS'
+    RPS_BDEI = 'RPS_MASTERCHEF_BDEI'
+
+    AP_SINGLE_XDEUS = 'AP_SINGLE_XDEUS'
+    AP_XDEUS_DEUS = 'AP_XDEUS_DEUS'
+    AP_LP_DEUS_FTM = 'AP_LP_DEUS_FTM'
+    AP_LP_DEI_USDC = 'AP_LP_DEI_USDC'
+    AP_BEETS_DEI_USDC = 'AP_BEETS_DEI_USDC'
+    AP_SINGLE_BDEI = 'AP_SINGLE_BDEI'
+    AP_DEI_BDEI = 'AP_DEI_BDEI'
+
+
 class RouteName:
     CIRCULATING_SUPPLY = 'circulating-supply'
     TOTAL_SUPPLY = 'total-supply'
@@ -40,7 +81,8 @@ class RouteName:
 
     @classmethod
     def is_valid(cls, route):
-        return route in (cls.CIRCULATING_SUPPLY, cls.NON_CIRCULATING_SUPPLY, cls.TOTAL_SUPPLY, cls.FDV, cls.MARKETCAP, cls.PRICE)
+        return route in (
+            cls.CIRCULATING_SUPPLY, cls.NON_CIRCULATING_SUPPLY, cls.TOTAL_SUPPLY, cls.FDV, cls.MARKETCAP, cls.PRICE)
 
 
 # get total lock
@@ -52,6 +94,41 @@ def get_tl(deus_ftm: Contract, deus_eth: Contract):
     tl_xd_ftm = round(tl_xd_ftm / 1e18)
     tl_xdd_eth = round(tl_xdd_eth / 1e18)
     return tl_xdd_ftm, tl_xd_ftm, tl_xdd_eth
+
+
+def block_time(duration: int = 20_000):
+    current_block = w3.eth.block_number
+    b = w3.eth.get_block(current_block).timestamp
+    a = w3.eth.get_block(current_block - duration).timestamp
+    return (b - a) / duration
+
+
+def get_reward_per_second():
+    rps_xdeus, rps_spooky, rps_beets, tpb_bdei = mc_helper.functions.getRewardPerSecond().call()
+    # rewardPerSecond = tokenPerBlock / blockTime
+    rps_bdei = int(tpb_bdei / block_time())
+    return rps_xdeus, rps_spooky, rps_beets, rps_bdei
+
+
+def get_alloc_point():
+    ap_xdeus0, ap_xdeus2, ap_spooky0, ap_spooky2, ap_beets, ap_bdei0, ap_bdei1 = mc_helper.functions.getAllocPoint().call()
+    return ap_xdeus0, ap_xdeus2, ap_spooky0, ap_spooky2, ap_beets, ap_bdei0, ap_bdei1
+
+
+def get_tvl():
+    tl_xdeus0, tl_xdeus2, tl_spooky0, tl_spooky2, tl_beets, tl_bdei0, tl_bdei1 = mc_helper.functions.getTVL().call()
+    _deus_price = int(price_db.get(PriceRedisKey.DEUS_SPOOKY)) / 1e6
+    _xdeus_ratio = int(price_db.get(PriceRedisKey.xDEUS_RATIO)) / 1e6
+    _xdeus_price = _deus_price * _xdeus_ratio
+    _legacy_dei_price = int(price_db.get(PriceRedisKey.legacyDEI_SPOOKY)) / 1e6
+    tvl_xdeus0 = round(tl_xdeus0 * _xdeus_price / 1e18)
+    tvl_xdeus2 = round(tl_xdeus2 * _xdeus_price / 1e18)
+    tvl_spooky0 = round(tl_spooky0 * _deus_price / 1e18)
+    tvl_spooky2 = round(tl_spooky2 / 1e18)
+    tvl_beets = round(tl_beets / 1e18)
+    tvl_bdei0 = round(tl_bdei0 * _legacy_dei_price / 1e18)
+    tvl_bdei1 = round(tl_bdei1 * _legacy_dei_price / 1e18)
+    return tvl_xdeus0, tvl_xdeus2, tvl_spooky0, tvl_spooky2, tvl_beets, tvl_bdei0, tvl_bdei1
 
 
 def get_xdeus_reward(xdeus_contract):
