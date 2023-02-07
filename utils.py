@@ -4,18 +4,15 @@ from collections import deque
 import web3
 from multicallable import Multicallable
 from web3 import HTTPProvider
+from web3.contract import Contract
 
-from constants import DEUS_ADDRESS, SPOOKY_USDC_FTM, SPOOKY_FTM_DEUS, PAIR_ABI, non_circulating_contracts, \
-    XDEUS_DEUS_POOL, XDEUS_POOL_ABI, XDEUS_ADDRESS, xdeus_non_circulating_contracts, MASTERCHEF_XDEUS, MASTERCHEF_ABI, \
-    XDEUS_DEUS_SOLIDLY
+from abi import ERC20_ABI, MASTERCHEF_XDEUS_ABI, PAIR_ABI, SWAP_FLASHLOAN_ABI
+from constants import DEUS_ADDRESS, SPOOKY_USDC_FTM, SPOOKY_FTM_DEUS, non_circulating_contracts, XDEUS_DEUS_POOL, \
+    XDEUS_ADDRESS, xdeus_non_circulating_contracts, MASTERCHEF_XDEUS, XDEUS_DEUS_SOLIDLY
 from config import rpcs
 
-with open('abi.json') as fp:
-    abi = json.load(fp)
-
 w3 = web3.Web3(web3.HTTPProvider(rpcs['fantom'][0]))
-masterchef_contract = w3.eth.contract(w3.toChecksumAddress(MASTERCHEF_XDEUS), abi=MASTERCHEF_ABI)
-deus_contract = w3.eth.contract(DEUS_ADDRESS, abi=PAIR_ABI)
+masterchef_contract = w3.eth.contract(w3.toChecksumAddress(MASTERCHEF_XDEUS), abi=MASTERCHEF_XDEUS_ABI)
 
 
 class RedisKey:
@@ -47,7 +44,7 @@ class RouteName:
 
 
 # get total lock
-def get_tl(deus_ftm, deus_eth):
+def get_tl(deus_ftm: Contract, deus_eth: Contract):
     tl_xdd_ftm = deus_ftm.functions.balanceOf(XDEUS_DEUS_POOL).call() * 2
     tl_xd_ftm = masterchef_contract.functions.totalDepositedAmount(0).call()
     tl_xdd_eth = deus_eth.functions.balanceOf(XDEUS_DEUS_SOLIDLY).call() * 2
@@ -76,7 +73,7 @@ def deus_spooky():
 
 
 def get_xdeus_ratio():
-    pool_contract = w3.eth.contract(XDEUS_DEUS_POOL, abi=XDEUS_POOL_ABI)
+    pool_contract = w3.eth.contract(XDEUS_DEUS_POOL, abi=SWAP_FLASHLOAN_ABI)
     dx = 1_000_000
     amount = pool_contract.functions.calculateSwap(0, 1, dx).call()
     return round(amount / dx, 3)
@@ -92,14 +89,14 @@ class RPCManager:
         self.rpcs = deque(rpcs[chain_name])
 
         w3 = self.get_w3()
-        self.deus_contract = w3.eth.contract(DEUS_ADDRESS, abi=abi)
-        self.xdeus_contract = w3.eth.contract(XDEUS_ADDRESS, abi=abi)
+        self.deus_contract = w3.eth.contract(DEUS_ADDRESS, abi=ERC20_ABI)
+        self.xdeus_contract = w3.eth.contract(XDEUS_ADDRESS, abi=ERC20_ABI)
         if non_circulating_contracts.get(chain_name):
-            self.mc = Multicallable(DEUS_ADDRESS, abi, w3)
+            self.mc = Multicallable(DEUS_ADDRESS, ERC20_ABI, w3)
         else:
             self.mc = None
         if xdeus_non_circulating_contracts.get(chain_name):
-            self.xmc = Multicallable(XDEUS_ADDRESS, abi, w3)
+            self.xmc = Multicallable(XDEUS_ADDRESS, ERC20_ABI, w3)
         else:
             self.xmc = None
 
@@ -112,9 +109,9 @@ class RPCManager:
 
     def update_rpc(self):
         w3 = self.get_w3()
-        self.deus_contract = w3.eth.contract(DEUS_ADDRESS, abi=abi)
-        self.xdeus_contract = w3.eth.contract(XDEUS_ADDRESS, abi=abi)
+        self.deus_contract = w3.eth.contract(DEUS_ADDRESS, abi=ERC20_ABI)
+        self.xdeus_contract = w3.eth.contract(XDEUS_ADDRESS, abi=ERC20_ABI)
         if self.mc is not None:
-            self.mc = Multicallable(DEUS_ADDRESS, abi, w3)
+            self.mc = Multicallable(DEUS_ADDRESS, ERC20_ABI, w3)
         if self.xmc is not None:
-            self.xmc = Multicallable(XDEUS_ADDRESS, abi, w3)
+            self.xmc = Multicallable(XDEUS_ADDRESS, ERC20_ABI, w3)
