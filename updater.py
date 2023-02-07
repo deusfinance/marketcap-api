@@ -1,6 +1,6 @@
 import time
 
-from config import update_timeout, NC_SUPPLY_REDIS_PREFIX, PRICE_REDIS_TAG, TOTAL_SUPPLY_REDIS_PREFIX, \
+from config import CHAIN_TOTAL_SUPPLY_REDIS_PREFIX, SUPPLY_IN_BRIDGE_CONTRACTS_REDIS_PREFIX, SUPPLY_IN_VEDEUS_CONTRACT_REDIS_PREFIX, X_CHAIN_TOTAL_SUPPLY_REDIS_PREFIX, X_SUPPLY_IN_BRIDGE_CONTRACTS_REDIS_PREFIX, update_timeout, NC_SUPPLY_REDIS_PREFIX, PRICE_REDIS_TAG, TOTAL_SUPPLY_REDIS_PREFIX, \
     X_NC_SUPPLY_REDIS_PREFIX, X_TOTAL_SUPPLY_REDIS_PREFIX, X_PRICE_REDIS_TAG, xDD_TL_FTM, xD_TL_FTM, xDD_TL_ETH
 from constants import non_circulating_contracts, bridge_pools, xdeus_non_circulating_contracts, xdeus_bridge_pools, \
     veDEUS_ADDRESS
@@ -35,11 +35,15 @@ def deus_updator(managers):
             else:
                 pool_supply = 0
             ve_deus = deus_contract.functions.balanceOf(veDEUS_ADDRESS).call() if chain == 'fantom' else 0
-            total_supply = deus_contract.functions.totalSupply().call() - pool_supply - ve_deus
+            chain_total_supply = deus_contract.functions.totalSupply().call()
+            total_supply = chain_total_supply - pool_supply - ve_deus
             if contracts:
                 nc_supply = sum(balance[0] for balance in mc.balanceOf(set(contracts.values())))
             else:
                 nc_supply = 0
+            marketcap_db.set(CHAIN_TOTAL_SUPPLY_REDIS_PREFIX + chain, chain_total_supply)
+            marketcap_db.set(SUPPLY_IN_BRIDGE_CONTRACTS_REDIS_PREFIX + chain, pool_supply)
+            marketcap_db.set(SUPPLY_IN_VEDEUS_CONTRACT_REDIS_PREFIX + chain, ve_deus)
             marketcap_db.set(NC_SUPPLY_REDIS_PREFIX + chain, nc_supply)
             marketcap_db.set(TOTAL_SUPPLY_REDIS_PREFIX + chain, total_supply)
         except Exception as ex:
@@ -48,6 +52,7 @@ def deus_updator(managers):
         else:
             print('TOTAL SUPPLY:   ', total_supply)
             print('NON-CIRCULATING:', nc_supply)
+            print('CIRCULATING:', total_supply - nc_supply)
     try:
         price = str(deus_spooky())
         marketcap_db.set(PRICE_REDIS_TAG, price)
@@ -65,27 +70,33 @@ def xdeus_updator(managers):
         xmc = managers[chain].xmc
         print(f'{chain:.^40}')
         try:
-            # if chain in xdeus_bridge_pools:
-            #     pool_supply = xdeus_contract.functions.balanceOf(xdeus_bridge_pools[chain]).call()
-            # else:
-            #     pool_supply = 0
-            msig_supply = xdeus_contract.functions.balanceOf(contracts['DEUS mSig']).call()
+            if chain in xdeus_bridge_pools:
+                pool_supply = xdeus_contract.functions.balanceOf(xdeus_bridge_pools[chain]).call()
+            else:
+                pool_supply = 0
+            msig_supply = xdeus_contract.functions.balanceOf(contracts['DEUS mSig']).call() if chain == 'fantom' else 0
             print('msig balance:', msig_supply)
             reward = get_xdeus_reward(xdeus_contract)
             print('Reward:', reward)
-            total_supply = xdeus_contract.functions.totalSupply().call() - msig_supply - reward
+            nc_supply = msig_supply + reward
+            chain_total_supply = xdeus_contract.functions.totalSupply().call()
+            supply = chain_total_supply - pool_supply
+            circulating_supply = supply - nc_supply
             # if contracts:
             #     nc_supply = sum(balance[0] for balance in xmc.balanceOf(set(contracts.values())))
             # else:
-            nc_supply = 0
             marketcap_db.set(X_NC_SUPPLY_REDIS_PREFIX + chain, nc_supply)
-            marketcap_db.set(X_TOTAL_SUPPLY_REDIS_PREFIX + chain, total_supply)
+            marketcap_db.set(X_TOTAL_SUPPLY_REDIS_PREFIX + chain, supply)
+            marketcap_db.set(X_CHAIN_TOTAL_SUPPLY_REDIS_PREFIX + chain, chain_total_supply)
+            marketcap_db.set(X_SUPPLY_IN_BRIDGE_CONTRACTS_REDIS_PREFIX + chain, pool_supply)
         except Exception as ex:
             print('Error:', ex)
             managers[chain].update_rpc()
         else:
-            print('TOTAL SUPPLY:   ', total_supply)
+            print('CHAIN TOTAL SUPPLY: ', chain_total_supply)
+            print('TOTAL SUPPLY:   ', supply)
             print('NON-CIRCULATING:', nc_supply)
+            print('CIRCULATING:', circulating_supply)
     try:
         price = str(xdeus_price())
         marketcap_db.set(X_PRICE_REDIS_TAG, price)
