@@ -52,7 +52,7 @@ def deus_updator(managers):
         else:
             print('TOTAL SUPPLY:   ', total_supply)
             print('NON-CIRCULATING:', nc_supply)
-            print('CIRCULATING:', total_supply- nc_supply)
+            print('CIRCULATING:', total_supply - nc_supply)
     try:
         price = str(deus_spooky())
         marketcap_db.set(PRICE_REDIS_TAG, price)
