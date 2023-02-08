@@ -202,6 +202,34 @@ def get_tvl():
                    mainnet={'xDEUS-DEUS': xdeus_deus_tvl_eth})
 
 
+@app.route('/tvl/<masterchef_name>/<pool_id>')
+def get_single_tvl(masterchef_name, pool_id):
+    key = None
+    if masterchef_name == 'xdeus':
+        if pool_id == '0':
+            key = DataRedisKey.TVL_SINGLE_XDEUS
+        elif pool_id == '2':
+            key = DataRedisKey.TVL_XDEUS_DEUS
+    elif masterchef_name == 'spooky':
+        if pool_id == '0':
+            key = DataRedisKey.TVL_LP_DEUS_FTM
+        elif pool_id == '2':
+            key = DataRedisKey.TVL_LP_DEI_USDC
+    elif masterchef_name == 'beets':
+        if pool_id == '0':
+            key = DataRedisKey.TVL_BEETS_DEI_USDC
+    elif masterchef_name == 'bdei':
+        if pool_id == '0':
+            key = DataRedisKey.TVL_SINGLE_BDEI
+        elif pool_id == '1':
+            key = DataRedisKey.TVL_DEI_BDEI
+    else:
+        return jsonify(status='error', msg=f'invalid masterchef name `{masterchef_name}`')
+    if key is None:
+        return jsonify(status='error', msg=f'invalid  poolID `{pool_id}` for masterchef {masterchef_name}')
+    return jsonify(int(marketcap_db.get(key)))
+
+
 @app.route('/dei/price')
 def get_dei_price():
     price = round(int(price_db.get(PriceRedisKey.DEI_FIREBIRD)) / 1e6, 3)

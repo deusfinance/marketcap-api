@@ -119,8 +119,18 @@ def tl_updator(managers):
 
 
 @handle_error
-def tvl_():
-    tvl_xdeus0, tvl_xdeus2, tvl_spooky0, tvl_spooky2, tvl_beets, tvl_bdei0, tvl_bdei1 = get_tvl()
+def tvl_updator():
+    keys = [DataRedisKey.TVL_SINGLE_XDEUS,
+            DataRedisKey.TVL_XDEUS_DEUS,
+            DataRedisKey.TVL_LP_DEUS_FTM,
+            DataRedisKey.TVL_LP_DEI_USDC,
+            DataRedisKey.TVL_BEETS_DEI_USDC,
+            DataRedisKey.TVL_SINGLE_BDEI,
+            DataRedisKey.TVL_DEI_BDEI]
+    all_tvl = get_tvl()
+    for key, tvl in zip(keys, all_tvl):
+        print(f'{key}:\t${tvl:,}')
+        marketcap_db.set(key, tvl)
 
 
 def run_updator():
@@ -133,6 +143,7 @@ def run_updator():
             deus_updator(managers)
             xdeus_updator(managers)
             tl_updator(managers)
+            tvl_updator()
         except KeyboardInterrupt:
             break
         time.sleep(update_timeout)
