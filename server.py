@@ -238,7 +238,7 @@ def get_single_tvl():
 
 
 @app.route('/getRewardPerSecond')
-def get_alloc_point():
+def get_reward_per_second():
     masterchef = request.args.get('masterchef')
     if masterchef is None:
         return jsonify(status='error', msg=f'missing param `masterchef`')
