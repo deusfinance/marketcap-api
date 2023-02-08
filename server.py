@@ -1,6 +1,6 @@
 import time
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 
 from constants import non_circulating_contracts, xdeus_non_circulating_contracts
 from redis_client import marketcap_db, price_db
@@ -202,31 +202,38 @@ def get_tvl():
                    mainnet={'xDEUS-DEUS': xdeus_deus_tvl_eth})
 
 
-@app.route('/tvl/<masterchef_name>/<pool_id>')
-def get_single_tvl(masterchef_name, pool_id):
+@app.route('/getTVL')
+def get_single_tvl():
+    masterchef = request.args.get('masterchef')
+    pool_id = request.args.get('poolId')
+    if masterchef is None:
+        return jsonify(status='error', msg=f'missing param `masterchef`')
+    if pool_id is None:
+        return jsonify(status='error', msg=f'missing param `poolId`')
+
     key = None
-    if masterchef_name == 'xdeus':
+    if masterchef == 'xdeus':
         if pool_id == '0':
             key = DataRedisKey.TVL_SINGLE_XDEUS
         elif pool_id == '2':
             key = DataRedisKey.TVL_XDEUS_DEUS
-    elif masterchef_name == 'spooky':
+    elif masterchef == 'spooky':
         if pool_id == '0':
             key = DataRedisKey.TVL_LP_DEUS_FTM
         elif pool_id == '2':
             key = DataRedisKey.TVL_LP_DEI_USDC
-    elif masterchef_name == 'beets':
+    elif masterchef == 'beets':
         if pool_id == '0':
             key = DataRedisKey.TVL_BEETS_DEI_USDC
-    elif masterchef_name == 'bdei':
+    elif masterchef == 'bdei':
         if pool_id == '0':
             key = DataRedisKey.TVL_SINGLE_BDEI
         elif pool_id == '1':
             key = DataRedisKey.TVL_DEI_BDEI
     else:
-        return jsonify(status='error', msg=f'invalid masterchef name `{masterchef_name}`')
+        return jsonify(status='error', msg=f'invalid masterchef `{masterchef}`')
     if key is None:
-        return jsonify(status='error', msg=f'invalid  poolID `{pool_id}` for masterchef {masterchef_name}')
+        return jsonify(status='error', msg=f'invalid  poolId `{pool_id}` for masterchef {masterchef}')
     return jsonify(int(marketcap_db.get(key)))
 
 
