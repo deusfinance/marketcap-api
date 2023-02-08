@@ -150,9 +150,9 @@ def get_xdeus_info(route):
     price = float(marketcap_db.get(DataRedisKey.X_PRICE_TAG))
     for chain in xdeus_chains:
         supply = int(marketcap_db.get(DataRedisKey.X_TOTAL_SUPPLY + chain))
-        ncSupply = int(marketcap_db.get(DataRedisKey.X_NC_SUPPLY + chain))
-        circulating_supply += supply - ncSupply
-        non_circulating_supply += ncSupply
+        nc_supply = int(marketcap_db.get(DataRedisKey.X_NC_SUPPLY + chain))
+        circulating_supply += supply - nc_supply
+        non_circulating_supply += nc_supply
         total_supply += supply
 
     if route == RouteName.CIRCULATING_SUPPLY:
