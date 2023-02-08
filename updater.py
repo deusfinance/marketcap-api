@@ -133,6 +133,33 @@ def tvl_updator():
         marketcap_db.set(key, tvl)
 
 
+@handle_error
+def reward_per_second_updator():
+    keys = [DataRedisKey.RPS_XDEUS,
+            DataRedisKey.RPS_SPOOKY,
+            DataRedisKey.RPS_BEETS,
+            DataRedisKey.RPS_BDEI]
+    all_rps = get_reward_per_second()
+    for key, rps in zip(keys, all_rps):
+        print(f'{key}:\t{rps}')
+        marketcap_db.set(key, rps)
+
+
+@handle_error
+def alloc_point_updator():
+    keys = [DataRedisKey.AP_SINGLE_XDEUS,
+            DataRedisKey.AP_XDEUS_DEUS,
+            DataRedisKey.AP_LP_DEUS_FTM,
+            DataRedisKey.AP_LP_DEI_USDC,
+            DataRedisKey.AP_BEETS_DEI_USDC,
+            DataRedisKey.AP_SINGLE_BDEI,
+            DataRedisKey.AP_DEI_BDEI]
+    all_ap = get_alloc_point()
+    for key, ap in zip(keys, all_ap):
+        print(f'{key}:\t{ap}')
+        marketcap_db.set(key, ap)
+
+
 def run_updator():
     managers = {}
     for chain, _ in non_circulating_contracts.items():
@@ -144,6 +171,8 @@ def run_updator():
             xdeus_updator(managers)
             tl_updator(managers)
             tvl_updator()
+            reward_per_second_updator()
+            alloc_point_updator()
         except KeyboardInterrupt:
             break
         time.sleep(update_timeout)

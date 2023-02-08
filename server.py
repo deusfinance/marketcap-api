@@ -237,6 +237,59 @@ def get_single_tvl():
     return jsonify(int(marketcap_db.get(key)))
 
 
+@app.route('/getRewardPerSecond')
+def get_alloc_point():
+    masterchef = request.args.get('masterchef')
+    if masterchef is None:
+        return jsonify(status='error', msg=f'missing param `masterchef`')
+    if masterchef == 'xdeus':
+        key = DataRedisKey.RPS_XDEUS
+    elif masterchef == 'spooky':
+        key = DataRedisKey.RPS_SPOOKY
+    elif masterchef == 'beets':
+        key = DataRedisKey.RPS_BEETS
+    elif masterchef == 'bdei':
+        key = DataRedisKey.RPS_BDEI
+    else:
+        return jsonify(status='error', msg=f'invalid masterchef `{masterchef}`')
+    return jsonify(int(marketcap_db.get(key)))
+
+
+@app.route('/getAllocPoint')
+def get_alloc_point():
+    masterchef = request.args.get('masterchef')
+    pool_id = request.args.get('poolId')
+    if masterchef is None:
+        return jsonify(status='error', msg=f'missing param `masterchef`')
+    if pool_id is None:
+        return jsonify(status='error', msg=f'missing param `poolId`')
+
+    key = None
+    if masterchef == 'xdeus':
+        if pool_id == '0':
+            key = DataRedisKey.AP_SINGLE_XDEUS
+        elif pool_id == '2':
+            key = DataRedisKey.AP_XDEUS_DEUS
+    elif masterchef == 'spooky':
+        if pool_id == '0':
+            key = DataRedisKey.AP_LP_DEUS_FTM
+        elif pool_id == '2':
+            key = DataRedisKey.AP_LP_DEI_USDC
+    elif masterchef == 'beets':
+        if pool_id == '0':
+            key = DataRedisKey.AP_BEETS_DEI_USDC
+    elif masterchef == 'bdei':
+        if pool_id == '0':
+            key = DataRedisKey.AP_SINGLE_BDEI
+        elif pool_id == '1':
+            key = DataRedisKey.AP_DEI_BDEI
+    else:
+        return jsonify(status='error', msg=f'invalid masterchef `{masterchef}`')
+    if key is None:
+        return jsonify(status='error', msg=f'invalid  poolId `{pool_id}` for masterchef {masterchef}')
+    return jsonify(int(marketcap_db.get(key)))
+
+
 @app.route('/dei/price')
 def get_dei_price():
     price = round(int(price_db.get(PriceRedisKey.DEI_FIREBIRD)) / 1e6, 3)
