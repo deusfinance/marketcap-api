@@ -41,8 +41,8 @@ xdeus_non_circulating_contracts = {
         'MasterChefV2': '0x62ad8dE6740314677F06723a7A07797aE5082Dbb',
         'DEUS mSig': '0xEf6b0872CfDF881Cf9Fe0918D3FA979c616AF983',
     },
-    'mainnet': {
-    },
+    # 'mainnet': {
+    # },
 }
 
 xdeus_bridge_pools = {
