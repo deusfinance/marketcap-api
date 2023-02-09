@@ -7,7 +7,8 @@ from web3.contract import Contract
 
 from abi import ERC20_ABI, MASTERCHEF_XDEUS_ABI, PAIR_ABI, SWAP_FLASHLOAN_ABI, MASTERCHEF_HELPER_ABI
 from constants import DEUS_ADDRESS, SPOOKY_USDC_FTM, SPOOKY_FTM_DEUS, non_circulating_contracts, XDEUS_DEUS_POOL, \
-    XDEUS_ADDRESS, xdeus_non_circulating_contracts, MASTERCHEF_XDEUS, XDEUS_DEUS_SOLIDLY, MASTERCHEF_HELPER
+    XDEUS_ADDRESS, xdeus_non_circulating_contracts, MASTERCHEF_XDEUS, SOLIDLY_XDEUS_DEUS, MASTERCHEF_HELPER, \
+    DEI_ADDRESS, usdc_address, SOLIDLY_WETH_DEUS, SOLIDLY_WETH_DEI, SOLIDLY_USDC_DEI
 from config import rpcs
 from redis_client import price_db
 
@@ -56,6 +57,10 @@ class DataRedisKey:
     TVL_BEETS_DEI_USDC = 'TVL_BEETS_DEI_USDC'
     TVL_SINGLE_BDEI = 'TVL_SINGLE_BDEI'
     TVL_DEI_BDEI = 'TVL_DEI_BDEI'
+    TVL_SOLIDLY_XDEUS_DEUS = 'TVL_SOLIDLY_XDEUS_DEUS'
+    TVL_SOLIDLY_WETH_DEUS = 'TVL_SOLIDLY_WETH_DEUS'
+    TVL_SOLIDLY_WETH_DEI = 'TVL_SOLIDLY_WETH_DEI'
+    TVL_SOLIDLY_USDC_DEI = 'TVL_SOLIDLY_USDC_DEI'
 
     RPS_XDEUS = 'RPS_MASTERCHEF_XDEUS'
     RPS_SPOOKY = 'RPS_MASTERCHEF_SPOOKY'
@@ -85,11 +90,50 @@ class RouteName:
             cls.CIRCULATING_SUPPLY, cls.NON_CIRCULATING_SUPPLY, cls.TOTAL_SUPPLY, cls.FDV, cls.MARKETCAP, cls.PRICE)
 
 
+class RPCManager:
+    def __init__(self, chain_name: str):
+        self.chain_name = chain_name
+        self.rpcs = deque(rpcs[chain_name])
+
+        w3 = self.get_w3()
+        self.deus_contract = w3.eth.contract(DEUS_ADDRESS, abi=ERC20_ABI)
+        self.xdeus_contract = w3.eth.contract(XDEUS_ADDRESS, abi=ERC20_ABI)
+        self.dei_contract = w3.eth.contract(DEI_ADDRESS, abi=ERC20_ABI)
+        self.usdc_contract = w3.eth.contract(usdc_address[chain_name], abi=ERC20_ABI)
+
+        if non_circulating_contracts.get(chain_name):
+            self.mc = Multicallable(DEUS_ADDRESS, ERC20_ABI, w3)
+        else:
+            self.mc = None
+        if xdeus_non_circulating_contracts.get(chain_name):
+            self.xmc = Multicallable(XDEUS_ADDRESS, ERC20_ABI, w3)
+        else:
+            self.xmc = None
+
+    def get_w3(self):
+        for rpc in self.rpcs:
+            w3 = web3.Web3(HTTPProvider(rpc))
+            if w3.isConnected():
+                break
+        return w3
+
+    def update_rpc(self):
+        w3 = self.get_w3()
+        self.deus_contract = w3.eth.contract(DEUS_ADDRESS, abi=ERC20_ABI)
+        self.xdeus_contract = w3.eth.contract(XDEUS_ADDRESS, abi=ERC20_ABI)
+        self.dei_contract = w3.eth.contract(DEI_ADDRESS, abi=ERC20_ABI)
+        self.usdc_contract = w3.eth.contract(usdc_address[self.chain_name], abi=ERC20_ABI)
+        if self.mc is not None:
+            self.mc = Multicallable(DEUS_ADDRESS, ERC20_ABI, w3)
+        if self.xmc is not None:
+            self.xmc = Multicallable(XDEUS_ADDRESS, ERC20_ABI, w3)
+
+
 # get total lock
 def get_tl(deus_ftm: Contract, deus_eth: Contract):
     tl_xdd_ftm = deus_ftm.functions.balanceOf(XDEUS_DEUS_POOL).call() * 2
     tl_xd_ftm = masterchef_contract.functions.totalDepositedAmount(0).call()
-    tl_xdd_eth = deus_eth.functions.balanceOf(XDEUS_DEUS_SOLIDLY).call() * 2
+    tl_xdd_eth = deus_eth.functions.balanceOf(SOLIDLY_XDEUS_DEUS).call() * 2
     tl_xdd_ftm = round(tl_xdd_ftm / 1e18)
     tl_xd_ftm = round(tl_xd_ftm / 1e18)
     tl_xdd_eth = round(tl_xdd_eth / 1e18)
@@ -115,7 +159,7 @@ def get_alloc_point():
     return ap_xdeus0, ap_xdeus2, ap_spooky0, ap_spooky2, ap_beets, ap_bdei0, ap_bdei1
 
 
-def get_tvl():
+def get_tvl(manager: RPCManager):
     tl_xdeus0, tl_xdeus2, tl_spooky0, tl_spooky2, tl_beets, tl_bdei0, tl_bdei1 = mc_helper.functions.getTVL().call()
     _deus_price = int(price_db.get(PriceRedisKey.DEUS_SPOOKY)) / 1e6
     _xdeus_ratio = int(price_db.get(PriceRedisKey.xDEUS_RATIO)) / 1e6
@@ -128,7 +172,18 @@ def get_tvl():
     tvl_beets = round(tl_beets / 1e18)
     tvl_bdei0 = round(tl_bdei0 * _legacy_dei_price / 1e18)
     tvl_bdei1 = round(tl_bdei1 * _legacy_dei_price / 1e18)
-    return tvl_xdeus0, tvl_xdeus2, tvl_spooky0, tvl_spooky2, tvl_beets, tvl_bdei0, tvl_bdei1
+    tl_solidly0 = manager.deus_contract.functions.balanceOf(SOLIDLY_XDEUS_DEUS).call() * 2
+    tl_solidly1 = manager.deus_contract.functions.balanceOf(SOLIDLY_WETH_DEUS).call() * 2
+    tl_solidly2 = manager.dei_contract.functions.balanceOf(SOLIDLY_WETH_DEI).call() * 2
+    _dei_balance = manager.dei_contract.functions.balanceOf(SOLIDLY_USDC_DEI).call()
+    _usdc_balance = manager.usdc_contract.functions.balanceOf(SOLIDLY_USDC_DEI).call()
+    tl_solidly3 = _dei_balance + _usdc_balance * 10 ** 12
+    tvl_solidly0 = round(tl_solidly0 * _deus_price / 1e18)
+    tvl_solidly1 = round(tl_solidly1 * _deus_price / 1e18)
+    tvl_solidly2 = round(tl_solidly2 / 1e18)
+    tvl_solidly3 = round(tl_solidly3 / 1e18)
+    return (tvl_xdeus0, tvl_xdeus2, tvl_spooky0, tvl_spooky2, tvl_beets, tvl_bdei0, tvl_bdei1,
+            tvl_solidly0, tvl_solidly1, tvl_solidly2, tvl_solidly3)
 
 
 def get_xdeus_reward(xdeus_contract):
@@ -158,37 +213,3 @@ def get_xdeus_ratio():
 
 def xdeus_price():
     return get_xdeus_ratio() * deus_spooky()
-
-
-class RPCManager:
-    def __init__(self, chain_name: str):
-        self.chain_name = chain_name
-        self.rpcs = deque(rpcs[chain_name])
-
-        w3 = self.get_w3()
-        self.deus_contract = w3.eth.contract(DEUS_ADDRESS, abi=ERC20_ABI)
-        self.xdeus_contract = w3.eth.contract(XDEUS_ADDRESS, abi=ERC20_ABI)
-        if non_circulating_contracts.get(chain_name):
-            self.mc = Multicallable(DEUS_ADDRESS, ERC20_ABI, w3)
-        else:
-            self.mc = None
-        if xdeus_non_circulating_contracts.get(chain_name):
-            self.xmc = Multicallable(XDEUS_ADDRESS, ERC20_ABI, w3)
-        else:
-            self.xmc = None
-
-    def get_w3(self):
-        for rpc in self.rpcs:
-            w3 = web3.Web3(HTTPProvider(rpc))
-            if w3.isConnected():
-                break
-        return w3
-
-    def update_rpc(self):
-        w3 = self.get_w3()
-        self.deus_contract = w3.eth.contract(DEUS_ADDRESS, abi=ERC20_ABI)
-        self.xdeus_contract = w3.eth.contract(XDEUS_ADDRESS, abi=ERC20_ABI)
-        if self.mc is not None:
-            self.mc = Multicallable(DEUS_ADDRESS, ERC20_ABI, w3)
-        if self.xmc is not None:
-            self.xmc = Multicallable(XDEUS_ADDRESS, ERC20_ABI, w3)

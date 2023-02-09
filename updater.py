@@ -119,15 +119,19 @@ def tl_updator(managers):
 
 
 @handle_error
-def tvl_updator():
+def tvl_updator(managers):
     keys = [DataRedisKey.TVL_SINGLE_XDEUS,
             DataRedisKey.TVL_XDEUS_DEUS,
             DataRedisKey.TVL_LP_DEUS_FTM,
             DataRedisKey.TVL_LP_DEI_USDC,
             DataRedisKey.TVL_BEETS_DEI_USDC,
             DataRedisKey.TVL_SINGLE_BDEI,
-            DataRedisKey.TVL_DEI_BDEI]
-    all_tvl = get_tvl()
+            DataRedisKey.TVL_DEI_BDEI,
+            DataRedisKey.TVL_SOLIDLY_XDEUS_DEUS,
+            DataRedisKey.TVL_SOLIDLY_WETH_DEUS,
+            DataRedisKey.TVL_SOLIDLY_WETH_DEI,
+            DataRedisKey.TVL_SOLIDLY_USDC_DEI]
+    all_tvl = get_tvl(managers['mainnet'])
     for key, tvl in zip(keys, all_tvl):
         print(f'{key}:\t${tvl:,}')
         marketcap_db.set(key, tvl)
@@ -170,7 +174,7 @@ def run_updator():
             deus_updator(managers)
             xdeus_updator(managers)
             tl_updator(managers)
-            tvl_updator()
+            tvl_updator(managers)
             reward_per_second_updator()
             alloc_point_updator()
         except KeyboardInterrupt:

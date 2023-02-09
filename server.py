@@ -230,6 +230,15 @@ def get_single_tvl():
             key = DataRedisKey.TVL_SINGLE_BDEI
         elif pool_id == '1':
             key = DataRedisKey.TVL_DEI_BDEI
+    elif masterchef == 'solidly':
+        if pool_id == '0':
+            key = DataRedisKey.TVL_SOLIDLY_XDEUS_DEUS
+        elif pool_id == '1':
+            key = DataRedisKey.TVL_SOLIDLY_WETH_DEUS
+        elif pool_id == '2':
+            key = DataRedisKey.TVL_SOLIDLY_WETH_DEI
+        elif pool_id == '3':
+            key = DataRedisKey.TVL_SOLIDLY_USDC_DEI
     else:
         return jsonify(status='error', msg=f'invalid masterchef `{masterchef}`')
     if key is None:
