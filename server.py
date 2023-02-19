@@ -351,5 +351,14 @@ def get_prices():
     return jsonify(deus=deus, dei=dei, legacyDei=legacy_dei)
 
 
+@app.route('/deusPerWeek')
+def get_deus_per_week():
+    try:
+        deus_per_week = float(marketcap_db.get(DataRedisKey.DEUS_PER_WEEK))
+    except:
+        return jsonify(status='error', msg='N/A'), 400
+    return jsonify(deus_per_week), 200
+
+
 if __name__ == '__main__':
     app.run(port=5152)

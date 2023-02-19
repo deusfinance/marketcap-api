@@ -1,5 +1,7 @@
+import re
 from collections import deque
 
+import requests
 import web3
 from multicallable import Multicallable
 from web3 import HTTPProvider
@@ -9,7 +11,7 @@ from abi import ERC20_ABI, MASTERCHEF_XDEUS_ABI, PAIR_ABI, SWAP_FLASHLOAN_ABI, M
 from constants import DEUS_ADDRESS, SPOOKY_USDC_FTM, SPOOKY_FTM_DEUS, non_circulating_contracts, XDEUS_DEUS_POOL, \
     XDEUS_ADDRESS, xdeus_non_circulating_contracts, MASTERCHEF_XDEUS, SOLIDLY_XDEUS_DEUS, MASTERCHEF_HELPER, \
     DEI_ADDRESS, usdc_address, SOLIDLY_WETH_DEUS, SOLIDLY_WETH_DEI, SOLIDLY_USDC_DEI
-from config import rpcs
+from config import rpcs, sheet_url
 from redis_client import price_db
 
 w3 = web3.Web3(web3.HTTPProvider(rpcs['fantom'][0]))
@@ -75,6 +77,8 @@ class DataRedisKey:
     AP_SINGLE_BDEI = 'AP_SINGLE_BDEI'
     AP_DEI_BDEI = 'AP_DEI_BDEI'
 
+    DEUS_PER_WEEK = 'DEUS_PER_WEEK'
+
 
 class RouteName:
     CIRCULATING_SUPPLY = 'circulating-supply'
@@ -127,6 +131,15 @@ class RPCManager:
             self.mc = Multicallable(DEUS_ADDRESS, ERC20_ABI, w3)
         if self.xmc is not None:
             self.xmc = Multicallable(XDEUS_ADDRESS, ERC20_ABI, w3)
+
+
+def fetch_deus_per_week():
+    pattern = r'18</div></th><td class=\"s0\" dir=\"ltr\"></td><td class=\"s2\" dir=\"ltr\">([\d,.]+)<'
+    response = requests.get(sheet_url)
+    if response:
+        raw_deus_per_week: str = re.findall(pattern, response.text)[0]
+        deus_per_week = float(raw_deus_per_week.replace(',', ''))
+        return deus_per_week
 
 
 # get total lock

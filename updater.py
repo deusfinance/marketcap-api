@@ -6,7 +6,7 @@ from constants import non_circulating_contracts, bridge_pools, xdeus_non_circula
 from redis_client import marketcap_db
 
 from utils import RPCManager, deus_spooky, xdeus_price, get_xdeus_reward, get_tl, DataRedisKey, get_tvl, \
-    get_alloc_point, get_reward_per_second
+    get_alloc_point, get_reward_per_second, fetch_deus_per_week
 
 
 def handle_error(func):
@@ -164,12 +164,21 @@ def alloc_point_updator():
         marketcap_db.set(key, ap)
 
 
+@handle_error
+def deus_per_week_updater():
+    deus_per_week = fetch_deus_per_week()
+    if deus_per_week:
+        print('DeusPerWeek:', deus_per_week)
+        marketcap_db.set(DataRedisKey.DEUS_PER_WEEK, deus_per_week)
+
+
 def run_updator():
     managers = {}
     for chain, _ in non_circulating_contracts.items():
         managers[chain] = RPCManager(chain)
 
     while True:
+        slow = 0
         try:
             deus_updator(managers)
             xdeus_updator(managers)
@@ -177,6 +186,11 @@ def run_updator():
             tvl_updator(managers)
             reward_per_second_updator()
             alloc_point_updator()
+            if slow > 0:
+                slow -= 1
+            else:
+                deus_per_week_updater()
+                slow = 60
         except KeyboardInterrupt:
             break
         time.sleep(update_timeout)
