@@ -80,7 +80,7 @@ def xdeus_updator(managers):
             print('Reward:', reward)
             nc_supply = msig_supply + reward
             chain_total_supply = xdeus_contract.functions.totalSupply().call()
-            supply = chain_total_supply - pool_supply
+            supply = chain_total_supply
             circulating_supply = supply - nc_supply
             # if contracts:
             #     nc_supply = sum(balance[0] for balance in xmc.balanceOf(set(contracts.values())))
