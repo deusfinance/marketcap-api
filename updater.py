@@ -6,7 +6,7 @@ from constants import non_circulating_contracts, bridge_pools, xdeus_non_circula
 from redis_client import marketcap_db
 
 from utils import RPCManager, deus_spooky, xdeus_price, get_xdeus_reward, get_tl, DataRedisKey, get_tvl, \
-    get_alloc_point, get_reward_per_second, fetch_deus_per_week
+    get_alloc_point, get_reward_per_second, fetch_deus_per_week, fetch_dei_circulating_supply
 
 
 def handle_error(func):
@@ -20,6 +20,14 @@ def handle_error(func):
 
     new_func.__name__ = func.__name__
     return new_func
+
+
+@handle_error
+def dei_updater(managers):
+    print('***** DEI *****')
+    circulating_supply = fetch_dei_circulating_supply(managers['fantom'])
+    print('Circ Supply:', circulating_supply // 10 ** 18)
+    marketcap_db.set(DataRedisKey.DEI_CIRCULATING_SUPPLY, circulating_supply)
 
 
 @handle_error
@@ -182,6 +190,7 @@ def run_updator():
         try:
             deus_updator(managers)
             xdeus_updator(managers)
+            dei_updater(managers)
             tl_updator(managers)
             tvl_updator(managers)
             reward_per_second_updator()

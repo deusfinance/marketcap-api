@@ -78,6 +78,7 @@ class DataRedisKey:
     AP_DEI_BDEI = 'AP_DEI_BDEI'
 
     DEUS_PER_WEEK = 'DEUS_PER_WEEK'
+    DEI_CIRCULATING_SUPPLY = 'DEI_CIRCULATING_SUPPLY'
 
 
 class RouteName:
@@ -197,6 +198,10 @@ def get_tvl(manager: RPCManager):
     tvl_solidly3 = round(tl_solidly3 / 1e18)
     return (tvl_xdeus0, tvl_xdeus2, tvl_spooky0, tvl_spooky2, tvl_beets, tvl_bdei0, tvl_bdei1,
             tvl_solidly0, tvl_solidly1, tvl_solidly2, tvl_solidly3)
+
+
+def fetch_dei_circulating_supply(manager: RPCManager):
+    return manager.dei_contract.functions.totalSupply().call()
 
 
 def get_xdeus_reward(xdeus_contract):
