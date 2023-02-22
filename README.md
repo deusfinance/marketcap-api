@@ -2,10 +2,10 @@
 
 ## Usage
 
-### Run updator
+### Run updater
 
 ```shell
-$ python updator.py
+$ python updater.py
 ```
 
 ### Run server

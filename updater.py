@@ -31,7 +31,7 @@ def dei_updater(managers):
 
 
 @handle_error
-def deus_updator(managers):
+def deus_updater(managers):
     print('***** DEUS *****')
     for chain, contracts in non_circulating_contracts.items():
         deus_contract = managers[chain].deus_contract
@@ -71,7 +71,7 @@ def deus_updator(managers):
 
 
 @handle_error
-def xdeus_updator(managers):
+def xdeus_updater(managers):
     print('***** xDEUS *****')
     for chain, contracts in xdeus_non_circulating_contracts.items():
         xdeus_contract = managers[chain].xdeus_contract
@@ -115,7 +115,7 @@ def xdeus_updator(managers):
 
 
 @handle_error
-def tl_updator(managers):
+def tl_updater(managers):
     print('***** Total Lock *****')
     tl_xdd_ftm, tl_xd_ftm, tl_xdd_eth = get_tl(managers['fantom'].deus_contract, managers['mainnet'].deus_contract)
     print('TL xDEUS/DEUS ftm:', tl_xdd_ftm)
@@ -127,7 +127,7 @@ def tl_updator(managers):
 
 
 @handle_error
-def tvl_updator(managers):
+def tvl_updater(managers):
     keys = [DataRedisKey.TVL_SINGLE_XDEUS,
             DataRedisKey.TVL_XDEUS_DEUS,
             DataRedisKey.TVL_LP_DEUS_FTM,
@@ -146,7 +146,7 @@ def tvl_updator(managers):
 
 
 @handle_error
-def reward_per_second_updator():
+def reward_per_second_updater():
     keys = [DataRedisKey.RPS_XDEUS,
             DataRedisKey.RPS_SPOOKY,
             DataRedisKey.RPS_BEETS,
@@ -158,7 +158,7 @@ def reward_per_second_updator():
 
 
 @handle_error
-def alloc_point_updator():
+def alloc_point_updater():
     keys = [DataRedisKey.AP_SINGLE_XDEUS,
             DataRedisKey.AP_XDEUS_DEUS,
             DataRedisKey.AP_LP_DEUS_FTM,
@@ -180,7 +180,7 @@ def deus_per_week_updater():
         marketcap_db.set(DataRedisKey.DEUS_PER_WEEK, deus_per_week)
 
 
-def run_updator():
+def run_updater():
     managers = {}
     for chain, _ in non_circulating_contracts.items():
         managers[chain] = RPCManager(chain)
@@ -188,13 +188,13 @@ def run_updator():
     while True:
         slow = 0
         try:
-            deus_updator(managers)
-            xdeus_updator(managers)
+            deus_updater(managers)
+            xdeus_updater(managers)
             dei_updater(managers)
-            tl_updator(managers)
-            tvl_updator(managers)
-            reward_per_second_updator()
-            alloc_point_updator()
+            tl_updater(managers)
+            tvl_updater(managers)
+            reward_per_second_updater()
+            alloc_point_updater()
             if slow > 0:
                 slow -= 1
             else:
@@ -206,4 +206,4 @@ def run_updator():
 
 
 if __name__ == '__main__':
-    run_updator()
+    run_updater()
