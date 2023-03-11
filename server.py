@@ -21,8 +21,9 @@ def gradual_circulating_supply(actual_supply):
 
 
 def get_marketcap_info():
-    deus_price = float(marketcap_db.get(DataRedisKey.PRICE_TAG))
-    xdeus_price = float(marketcap_db.get(DataRedisKey.X_PRICE_TAG))
+    usdc_price = float(price_db.get(PriceRedisKey.USDC_KRAKEN))
+    deus_price = float(marketcap_db.get(DataRedisKey.PRICE_TAG)) * usdc_price
+    xdeus_price = float(marketcap_db.get(DataRedisKey.X_PRICE_TAG)) * usdc_price
     result = dict(price=dict(deus=str(deus_price), xdeus=str(xdeus_price)), result={})
     totalAmounts = dict(totalSupply=0,
                         totalSupplyOnChain=0,
@@ -134,7 +135,8 @@ def get_deus_info(route):
         return jsonify(round(price * total_supply / 1e18))
 
     elif route == RouteName.PRICE:
-        deus_price = float(marketcap_db.get(DataRedisKey.PRICE_TAG))
+        usdc_price = float(price_db.get(PriceRedisKey.USDC_KRAKEN))
+        deus_price = float(marketcap_db.get(DataRedisKey.PRICE_TAG)) * usdc_price
         return jsonify(deus_price)
 
     return jsonify(status='error', msg='Route not found'), 404
@@ -171,7 +173,8 @@ def get_xdeus_info(route):
         return jsonify(round(price * total_supply / 1e18))
 
     elif route == RouteName.PRICE:
-        xdeus_price = float(marketcap_db.get(DataRedisKey.X_PRICE_TAG))
+        usdc_price = float(price_db.get(PriceRedisKey.USDC_KRAKEN))
+        xdeus_price = float(marketcap_db.get(DataRedisKey.X_PRICE_TAG)) * usdc_price
         return jsonify(xdeus_price)
 
     return jsonify(status='error', msg='Route not found'), 404
@@ -193,8 +196,9 @@ def get_xdeus_deus_marketcap():
 
 @app.route('/tvl')
 def get_tvl():
-    deus_price = float(marketcap_db.get(DataRedisKey.PRICE_TAG))
-    xdeus_price = float(marketcap_db.get(DataRedisKey.X_PRICE_TAG))
+    usdc_price = float(price_db.get(PriceRedisKey.USDC_KRAKEN))
+    deus_price = float(marketcap_db.get(DataRedisKey.PRICE_TAG)) * usdc_price
+    xdeus_price = float(marketcap_db.get(DataRedisKey.X_PRICE_TAG)) * usdc_price
     xdeus_deus_tvl_ftm = round(int(marketcap_db.get(DataRedisKey.xDD_TL_FTM)) * deus_price)
     xdeus_tvl_ftm = round(int(marketcap_db.get(DataRedisKey.xD_TL_FTM)) * xdeus_price)
     xdeus_deus_tvl_eth = round(int(marketcap_db.get(DataRedisKey.xDD_TL_ETH)) * deus_price)
@@ -353,8 +357,9 @@ def get_prices():
     legacy_dei.append(dict(price=prices[8], source='beethovenX'))
     deus.append(dict(price=prices[9], source='gateio'))
     deus.append(dict(price=prices[10], source='mexc'))
-
-    return jsonify(deus=deus, dei=dei, legacyDei=legacy_dei)
+    usdc_price = float(price_db.get(PriceRedisKey.USDC_KRAKEN))
+    usdc = [dict(price=str(usdc_price), source='kraken')]
+    return jsonify(usdc=usdc, deus=deus, dei=dei, legacyDei=legacy_dei)
 
 
 @app.route('/deusPerWeek')

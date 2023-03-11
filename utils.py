@@ -32,6 +32,7 @@ class PriceRedisKey:
     DEUS_MEXC = 'DEUS_MEXC'  # float
     DEUS_SOLIDLY_ETH = 'DEUS_SOLIDLY_ETH'  # decimals 6
     DEI_SOLIDLY_ETH = 'DEI_SOLIDLY_ETH'  # decimals 6
+    USDC_KRAKEN = 'USDC_KRAKEN'  # float
 
 
 class DataRedisKey:
