@@ -311,7 +311,7 @@ def get_dei_price():
 
 @app.route('/dei/reserves')
 def get_dei_reserves():
-    reserves = marketcap_db.get(DataRedisKey.DEI_RESERVES)
+    reserves = int(marketcap_db.get(DataRedisKey.DEI_RESERVES))
     return jsonify(reserves)
 
 
