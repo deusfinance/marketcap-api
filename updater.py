@@ -6,7 +6,7 @@ from constants import non_circulating_contracts, bridge_pools, xdeus_non_circula
 from redis_client import marketcap_db
 
 from utils import RPCManager, deus_spooky, xdeus_price, get_xdeus_reward, get_tl, DataRedisKey, get_tvl, \
-    get_alloc_point, get_reward_per_second, fetch_deus_per_week, fetch_dei_circulating_supply
+    get_alloc_point, get_reward_per_second, fetch_deus_per_week, fetch_dei_circulating_supply, fetch_dei_reserves
 
 
 def handle_error(func):
@@ -180,6 +180,13 @@ def deus_per_week_updater():
         marketcap_db.set(DataRedisKey.DEUS_PER_WEEK, deus_per_week)
 
 
+@handle_error
+def dei_reserves_updater(managers):
+    reserves = fetch_dei_reserves(managers)
+    print(f'DEI reserves: {reserves:,.2f}')
+    marketcap_db.set(DataRedisKey.DEI_RESERVES, round(reserves))
+
+
 def run_updater():
     managers = {}
     for chain, _ in non_circulating_contracts.items():
@@ -195,6 +202,7 @@ def run_updater():
             tvl_updater(managers)
             reward_per_second_updater()
             alloc_point_updater()
+            dei_reserves_updater(managers)
             if slow > 0:
                 slow -= 1
             else:

@@ -309,6 +309,12 @@ def get_dei_price():
     return jsonify(price)
 
 
+@app.route('/dei/reserves')
+def get_dei_reserves():
+    reserves = price_db.get(DataRedisKey.DEI_RESERVES)
+    return jsonify(reserves)
+
+
 @app.route('/dei/circ-supply')  # TODO: change this route to '/dei/circulating-supply'
 def get_dei_circ_supply():
     supply = int(marketcap_db.get(DataRedisKey.DEI_CIRCULATING_SUPPLY))

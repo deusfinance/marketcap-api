@@ -1,5 +1,6 @@
 import re
 from collections import deque
+from typing import List
 
 import requests
 import web3
@@ -10,7 +11,7 @@ from web3.contract import Contract
 from abi import ERC20_ABI, MASTERCHEF_XDEUS_ABI, PAIR_ABI, SWAP_FLASHLOAN_ABI, MASTERCHEF_HELPER_ABI
 from constants import DEUS_ADDRESS, SPOOKY_USDC_FTM, SPOOKY_FTM_DEUS, non_circulating_contracts, XDEUS_DEUS_POOL, \
     XDEUS_ADDRESS, xdeus_non_circulating_contracts, MASTERCHEF_XDEUS, SOLIDLY_XDEUS_DEUS, MASTERCHEF_HELPER, \
-    DEI_ADDRESS, usdc_address, SOLIDLY_WETH_DEUS, SOLIDLY_WETH_DEI, SOLIDLY_USDC_DEI
+    DEI_ADDRESS, usdc_address, SOLIDLY_WETH_DEUS, SOLIDLY_WETH_DEI, SOLIDLY_USDC_DEI, dei_reserve_addresses
 from config import rpcs, sheet_url
 from redis_client import price_db
 
@@ -80,6 +81,7 @@ class DataRedisKey:
 
     DEUS_PER_WEEK = 'DEUS_PER_WEEK'
     DEI_CIRCULATING_SUPPLY = 'DEI_CIRCULATING_SUPPLY'
+    DEI_RESERVES = 'DEI_RESERVES'
 
 
 class RouteName:
@@ -133,6 +135,19 @@ class RPCManager:
             self.mc = Multicallable(DEUS_ADDRESS, ERC20_ABI, w3)
         if self.xmc is not None:
             self.xmc = Multicallable(XDEUS_ADDRESS, ERC20_ABI, w3)
+
+
+def fetch_dei_reserves(managers: List[RPCManager]):
+    reserves = 0
+    for network, accounts in dei_reserve_addresses.items():
+        w3 = managers[network].get_w3()
+        for account, tokens in accounts.items():
+            for token in tokens:
+                token_contract = w3.eth.contract(token, abi=ERC20_ABI)
+                decimals = token_contract.functions.decimals().call()
+                balance = token_contract.functions.balanceOf(account).call()
+                reserves += balance / 10 ** decimals
+    return reserves
 
 
 def fetch_deus_per_week():
