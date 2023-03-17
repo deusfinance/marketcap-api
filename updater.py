@@ -1,3 +1,4 @@
+import json
 import time
 
 from config import update_timeout
@@ -182,9 +183,10 @@ def deus_per_week_updater():
 
 @handle_error
 def dei_reserves_updater(managers):
-    reserves = fetch_dei_reserves(managers)
-    print(f'DEI reserves: {reserves:,.2f}')
-    marketcap_db.set(DataRedisKey.DEI_RESERVES, round(reserves))
+    reserves, total = fetch_dei_reserves(managers)
+    print(f'DEI reserves: {total:,.2f}')
+    marketcap_db.set(DataRedisKey.DEI_RESERVES, round(total))
+    marketcap_db.set(DataRedisKey.DEI_JSON_RESERVES, json.dumps(reserves))
 
 
 def run_updater():

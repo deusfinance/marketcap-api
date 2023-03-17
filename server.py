@@ -1,3 +1,4 @@
+import json
 import time
 
 from flask import Flask, jsonify, request
@@ -312,6 +313,12 @@ def get_dei_price():
 @app.route('/dei/reserves')
 def get_dei_reserves():
     reserves = int(marketcap_db.get(DataRedisKey.DEI_RESERVES))
+    return jsonify(reserves)
+
+
+@app.route('/dei/reserves/detail')
+def get_dei_reserves_detail():
+    reserves = json.loads(marketcap_db.get(DataRedisKey.DEI_JSON_RESERVES))
     return jsonify(reserves)
 
 

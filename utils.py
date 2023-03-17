@@ -1,5 +1,5 @@
 import re
-from collections import deque
+from collections import deque, defaultdict
 from typing import List
 
 import requests
@@ -82,6 +82,7 @@ class DataRedisKey:
     DEUS_PER_WEEK = 'DEUS_PER_WEEK'
     DEI_CIRCULATING_SUPPLY = 'DEI_CIRCULATING_SUPPLY'
     DEI_RESERVES = 'DEI_RESERVES'
+    DEI_JSON_RESERVES = 'DEI_JSON_RESERVES'
 
 
 class RouteName:
@@ -138,16 +139,20 @@ class RPCManager:
 
 
 def fetch_dei_reserves(managers: List[RPCManager]):
-    reserves = 0
+    reserves = defaultdict(lambda: defaultdict(list))
+    total = 0
     for network, accounts in dei_reserve_addresses.items():
         w3 = managers[network].get_w3()
         for account, tokens in accounts.items():
             for token in tokens:
                 token_contract = w3.eth.contract(token, abi=ERC20_ABI)
                 decimals = token_contract.functions.decimals().call()
+                symbol = token_contract.functions.symbol().call()
                 balance = token_contract.functions.balanceOf(account).call()
-                reserves += balance / 10 ** decimals
-    return reserves
+                amount = round(balance / 10 ** decimals, 2)
+                reserves[account][network].append(dict(token=symbol, balance=str(amount)))
+                total += amount
+    return reserves, total
 
 
 def fetch_deus_per_week():
