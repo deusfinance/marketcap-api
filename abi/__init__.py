@@ -17,3 +17,6 @@ with open('abi/swap_flashloan.json') as fp:
 
 with open('abi/masterchef_helper.json') as fp:
     MASTERCHEF_HELPER_ABI = json.load(fp)
+
+with open('abi/dei_strategy.json') as fp:
+    DEI_STRATEGY_ABI = json.load(fp)
