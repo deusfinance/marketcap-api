@@ -306,7 +306,11 @@ def get_alloc_point():
 
 @app.route('/dei/price')
 def get_dei_price():
-    price = round(int(price_db.get(PriceRedisKey.DEI_FIREBIRD)) / 1e6, 3)
+    value = price_db.get(PriceRedisKey.DEI_FIREBIRD)
+    if value == b'N/A':
+        price = 1.0
+    else:
+        price = round(int(value) / 1e6, 3)
     return jsonify(price)
 
 
