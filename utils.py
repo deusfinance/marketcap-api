@@ -8,10 +8,10 @@ from multicallable import Multicallable
 from web3 import HTTPProvider
 from web3.contract import Contract
 
-from abi import ERC20_ABI, MASTERCHEF_XDEUS_ABI, PAIR_ABI, SWAP_FLASHLOAN_ABI, MASTERCHEF_HELPER_ABI
-from constants import DEUS_ADDRESS, SPOOKY_USDC_FTM, SPOOKY_FTM_DEUS, non_circulating_contracts, XDEUS_DEUS_POOL, \
+from abi import DEI_STRATEGY_ABI, ERC20_ABI, MASTERCHEF_XDEUS_ABI, PAIR_ABI, SWAP_FLASHLOAN_ABI, MASTERCHEF_HELPER_ABI
+from constants import DEI_STRATEGY_ADDRESS, DEUS_ADDRESS, SPOOKY_USDC_FTM, SPOOKY_FTM_DEUS, non_circulating_contracts, XDEUS_DEUS_POOL, \
     XDEUS_ADDRESS, xdeus_non_circulating_contracts, MASTERCHEF_XDEUS, SOLIDLY_XDEUS_DEUS, MASTERCHEF_HELPER, \
-    DEI_ADDRESS, usdc_address, SOLIDLY_WETH_DEUS, SOLIDLY_WETH_DEI, SOLIDLY_USDC_DEI, dei_reserve_addresses
+    DEI_ADDRESS, usdc_address, SOLIDLY_WETH_DEUS, SOLIDLY_WETH_DEI, SOLIDLY_USDC_DEI, dei_reserve_addresses, dei_reserve_token_symbols
 from config import rpcs, sheet_url
 from redis_client import price_db
 
@@ -83,6 +83,9 @@ class DataRedisKey:
     DEI_CIRCULATING_SUPPLY = 'DEI_CIRCULATING_SUPPLY'
     DEI_RESERVES = 'DEI_RESERVES'
     DEI_JSON_RESERVES = 'DEI_JSON_RESERVES'
+    DEI_JSON_TOKEN_WISE_RESERVE_BALANCES = 'DEI_JSON_TOKEN_WISE_RESERVE_BALANCES'
+    DEI_DETAILED_RESERVES = 'DEI_DETAILED_RESERVES'
+    DEI_SEIGNIORAGE_RATIO = 'DEI_SEIGNIORAGE_RATIO'
 
 
 class RouteName:
@@ -141,6 +144,10 @@ class RPCManager:
 def fetch_dei_reserves(managers: List[RPCManager]):
     reserves = defaultdict(lambda: defaultdict(list))
     total = 0
+    token_balances = dict(USDC=0,
+                        USDD=0,
+                        USDT=0,
+                        DAI=0)
     for network, accounts in dei_reserve_addresses.items():
         w3 = managers[network].get_w3()
         for account, tokens in accounts.items():
@@ -151,9 +158,17 @@ def fetch_dei_reserves(managers: List[RPCManager]):
                 balance = token_contract.functions.balanceOf(account).call()
                 amount = round(balance / 10 ** decimals, 2)
                 reserves[account][network].append(dict(token=symbol, balance=str(amount)))
+                token_balances[symbol] += amount
                 total += amount
-    return reserves, total
+    return reserves, total, token_balances
 
+def fetch_dei_seigniorage(manager: RPCManager):
+    w3 = manager.get_w3()
+    dei_strategy_contract = w3.eth.contract(DEI_STRATEGY_ADDRESS, abi=DEI_STRATEGY_ABI)
+    mint_collateral_ratio = dei_strategy_contract.functions.mintCollateralRatio().call()
+    redeem_collateral_ratio = dei_strategy_contract.functions.redeemCollateralRatio().call()
+    dei_seigniorage = mint_collateral_ratio - redeem_collateral_ratio
+    return dei_seigniorage
 
 def fetch_deus_per_week():
     pattern = r'18</div></th><td class=\"s0\" dir=\"ltr\"></td><td class=\"s2\" dir=\"ltr\">([\d,.]+)<'

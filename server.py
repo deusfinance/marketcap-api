@@ -322,14 +322,24 @@ def get_dei_reserves():
 
 @app.route('/dei/reserves/detail')
 def get_dei_reserves_detail():
-    reserves = json.loads(marketcap_db.get(DataRedisKey.DEI_JSON_RESERVES))
-    return jsonify(reserves)
+    info = json.loads(marketcap_db.get(DataRedisKey.DEI_DETAILED_RESERVES))
+    return jsonify(info)
 
+@app.route('/dei/getDeiStats')
+def get_dei_stats():
+    #dei_price = price_db.get(PriceRedisKey.DEI_FIREBIRD)
+    total_supply = int(marketcap_db.get(DataRedisKey.DEI_CIRCULATING_SUPPLY))
+    circulating_supply = int(marketcap_db.get(DataRedisKey.DEI_CIRCULATING_SUPPLY))
+    reserves = json.loads(marketcap_db.get(DataRedisKey.DEI_DETAILED_RESERVES))
+    total_reserves = int(marketcap_db.get(DataRedisKey.DEI_RESERVES))
+    usdc_backing_per_dei = round(total_reserves * 1e18 / total_supply, 3)
+    dei_seigniorage_ratio = int(marketcap_db.get(DataRedisKey.DEI_SEIGNIORAGE_RATIO)) * 100 / 1e6
+    return jsonify({'usdcBackingPerDei': usdc_backing_per_dei, 'deiSeigniorageRatio': dei_seigniorage_ratio, 'totalSupply': str(total_supply), 'circulatingSupply': str(circulating_supply), 'reserves': reserves})
 
-@app.route('/dei/circ-supply')  # TODO: change this route to '/dei/circulating-supply'
+@app.route('/dei/circulating-supply')
 def get_dei_circ_supply():
     supply = int(marketcap_db.get(DataRedisKey.DEI_CIRCULATING_SUPPLY))
-    return jsonify(supply)
+    return jsonify(str(supply))
 
 
 @app.route('/getPrices')

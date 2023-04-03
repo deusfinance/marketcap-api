@@ -7,7 +7,7 @@ from constants import non_circulating_contracts, bridge_pools, xdeus_non_circula
 from redis_client import marketcap_db
 
 from utils import RPCManager, deus_spooky, xdeus_price, get_xdeus_reward, get_tl, DataRedisKey, get_tvl, \
-    get_alloc_point, get_reward_per_second, fetch_deus_per_week, fetch_dei_circulating_supply, fetch_dei_reserves
+    get_alloc_point, get_reward_per_second, fetch_deus_per_week, fetch_dei_circulating_supply, fetch_dei_reserves, fetch_dei_seigniorage
 
 
 def handle_error(func):
@@ -29,6 +29,9 @@ def dei_updater(managers):
     circulating_supply = fetch_dei_circulating_supply(managers['fantom'])
     print('Circ Supply:', circulating_supply // 10 ** 18)
     marketcap_db.set(DataRedisKey.DEI_CIRCULATING_SUPPLY, circulating_supply)
+    dei_seigniorage_ratio = fetch_dei_seigniorage(managers['fantom'])
+    print('DEI Seigniorage ratio', dei_seigniorage_ratio)
+    marketcap_db.set(DataRedisKey.DEI_SEIGNIORAGE_RATIO, dei_seigniorage_ratio)
 
 
 @handle_error
@@ -183,10 +186,12 @@ def deus_per_week_updater():
 
 @handle_error
 def dei_reserves_updater(managers):
-    reserves, total = fetch_dei_reserves(managers)
+    reserves, total, token_balances = fetch_dei_reserves(managers)
     print(f'DEI reserves: {total:,.2f}')
     marketcap_db.set(DataRedisKey.DEI_RESERVES, round(total))
     marketcap_db.set(DataRedisKey.DEI_JSON_RESERVES, json.dumps(reserves))
+    marketcap_db.set(DataRedisKey.DEI_JSON_TOKEN_WISE_RESERVE_BALANCES, json.dumps(token_balances))
+    marketcap_db.set(DataRedisKey.DEI_DETAILED_RESERVES, json.dumps({'wallets':reserves, 'tokenBalances':token_balances, 'total': total}))
 
 
 def run_updater():
