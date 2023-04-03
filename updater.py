@@ -7,7 +7,8 @@ from constants import non_circulating_contracts, bridge_pools, xdeus_non_circula
 from redis_client import marketcap_db
 
 from utils import RPCManager, deus_spooky, xdeus_price, get_xdeus_reward, get_tl, DataRedisKey, get_tvl, \
-    get_alloc_point, get_reward_per_second, fetch_deus_per_week, fetch_dei_circulating_supply, fetch_dei_reserves, fetch_dei_seigniorage
+    get_alloc_point, get_reward_per_second, fetch_deus_per_week, fetch_dei_circulating_supply, fetch_dei_reserves, \
+    fetch_dei_seigniorage
 
 
 def handle_error(func):
@@ -79,7 +80,7 @@ def xdeus_updater(managers):
     print('***** xDEUS *****')
     for chain, contracts in xdeus_non_circulating_contracts.items():
         xdeus_contract = managers[chain].xdeus_contract
-        xmc = managers[chain].xmc
+        # xmc = managers[chain].xmc
         print(f'{chain:.^40}')
         try:
             if chain in xdeus_bridge_pools:
@@ -189,9 +190,10 @@ def dei_reserves_updater(managers):
     reserves, total, token_balances = fetch_dei_reserves(managers)
     print(f'DEI reserves: {total:,.2f}')
     marketcap_db.set(DataRedisKey.DEI_RESERVES, round(total))
-    marketcap_db.set(DataRedisKey.DEI_JSON_RESERVES, json.dumps(reserves))
-    marketcap_db.set(DataRedisKey.DEI_JSON_TOKEN_WISE_RESERVE_BALANCES, json.dumps(token_balances))
-    marketcap_db.set(DataRedisKey.DEI_DETAILED_RESERVES, json.dumps({'wallets':reserves, 'tokenBalances':token_balances, 'total': total}))
+    marketcap_db.set(DataRedisKey.DEI_JSON_RESERVES,
+                     json.dumps({'wallets': reserves,
+                                 'tokenBalances': token_balances,
+                                 'total': str(round(total))}))
 
 
 def run_updater():

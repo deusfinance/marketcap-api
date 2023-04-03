@@ -322,24 +322,30 @@ def get_dei_reserves():
 
 @app.route('/dei/reserves/detail')
 def get_dei_reserves_detail():
-    info = json.loads(marketcap_db.get(DataRedisKey.DEI_DETAILED_RESERVES))
+    info = json.loads(marketcap_db.get(DataRedisKey.DEI_JSON_RESERVES))
     return jsonify(info)
+
 
 @app.route('/dei/getDeiStats')
 def get_dei_stats():
-    #dei_price = price_db.get(PriceRedisKey.DEI_FIREBIRD)
+    # dei_price = price_db.get(PriceRedisKey.DEI_FIREBIRD)
     total_supply = int(marketcap_db.get(DataRedisKey.DEI_CIRCULATING_SUPPLY))
-    circulating_supply = int(marketcap_db.get(DataRedisKey.DEI_CIRCULATING_SUPPLY))
-    reserves = json.loads(marketcap_db.get(DataRedisKey.DEI_DETAILED_RESERVES))
+    circulating_supply = total_supply
+    reserves = json.loads(marketcap_db.get(DataRedisKey.DEI_JSON_RESERVES))
     total_reserves = int(marketcap_db.get(DataRedisKey.DEI_RESERVES))
     usdc_backing_per_dei = round(total_reserves * 1e18 / total_supply, 3)
-    dei_seigniorage_ratio = int(marketcap_db.get(DataRedisKey.DEI_SEIGNIORAGE_RATIO)) * 100 / 1e6
-    return jsonify({'usdcBackingPerDei': usdc_backing_per_dei, 'deiSeigniorageRatio': dei_seigniorage_ratio, 'totalSupply': str(total_supply), 'circulatingSupply': str(circulating_supply), 'reserves': reserves})
+    dei_seigniorage_ratio = round(int(marketcap_db.get(DataRedisKey.DEI_SEIGNIORAGE_RATIO)) * 100 / 1e6, 3)
+    return jsonify({'usdcBackingPerDei': str(usdc_backing_per_dei),
+                    'deiSeigniorageRatio': str(dei_seigniorage_ratio),
+                    'totalSupply': str(total_supply),
+                    'circulatingSupply': str(circulating_supply),
+                    'reserves': reserves})
+
 
 @app.route('/dei/circulating-supply')
 def get_dei_circ_supply():
     supply = int(marketcap_db.get(DataRedisKey.DEI_CIRCULATING_SUPPLY))
-    return jsonify(str(supply))
+    return jsonify(supply)
 
 
 @app.route('/getPrices')
