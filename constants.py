@@ -14,6 +14,10 @@ non_circulating_contracts = {
         'TimeBasedMasterChefRewarder2': '0x58b86B32F560d025594ADFF02073Ae18976C4700',
         'Admin Wallet': '0xE5227F141575DcE74721f4A9bE2D7D636F923044',
         'veDIST': '0x09cE8C8E2704E84750E9c1a4F54A30eF60aF0073',
+        'solidlyLabsEscrow': '0xa3C325B6BB922A773924D608ECf8100A1C60F5dB',
+        'masterChefEscrow': '0x79EC95B28f8575b1fBcE2d441031B324965B5931',
+        'HedgerInvestmentEscrow': '0x4d601646cE6F359F93673087CdAF415470c61ecC',
+        'xDeusBackingEscrow': '0x0153Bf855fE4c5Dd5ACaf49C49A4a6625f071d93',
     },
     'polygon': {
         'Migrator': '0xD6739b3012Dd4179C0Cb45C57e6eADD063983143',
