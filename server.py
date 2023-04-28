@@ -348,6 +348,12 @@ def get_dei_circ_supply():
     return jsonify(supply)
 
 
+@app.route('/dei/allChainsTotalSupply')
+def get_dei_total_supply():
+    supply = int(marketcap_db.get(DataRedisKey.DEI_TOTAL_SUPPLY))
+    return jsonify(supply)
+
+
 @app.route('/getPrices')
 def get_prices():
     keys = [

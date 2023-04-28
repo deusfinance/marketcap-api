@@ -13,7 +13,7 @@ from constants import DEI_STRATEGY_ADDRESS, DEUS_ADDRESS, SPOOKY_USDC_FTM, SPOOK
     XDEUS_DEUS_POOL, \
     XDEUS_ADDRESS, xdeus_non_circulating_contracts, MASTERCHEF_XDEUS, SOLIDLY_XDEUS_DEUS, MASTERCHEF_HELPER, \
     DEI_ADDRESS, usdc_address, SOLIDLY_WETH_DEUS, SOLIDLY_WETH_DEI, SOLIDLY_USDC_DEI, dei_reserve_addresses, \
-    dei_reserve_token_symbols
+    dei_reserve_token_symbols, dei_bridge_pools
 from config import rpcs, sheet_url
 from redis_client import price_db
 
@@ -86,6 +86,7 @@ class DataRedisKey:
     DEI_RESERVES = 'DEI_RESERVES'
     DEI_JSON_RESERVES = 'DEI_JSON_RESERVES'
     DEI_SEIGNIORAGE_RATIO = 'DEI_SEIGNIORAGE_RATIO'
+    DEI_TOTAL_SUPPLY = 'DEI_TOTAL_SUPPLY'
 
 
 class RouteName:
@@ -158,6 +159,16 @@ def fetch_dei_reserves(managers: Dict[str, RPCManager]):
                 token_balances[symbol] += amount
                 total += amount
     return reserves, total, token_balances
+
+
+def fetch_dei_total_supply(managers: Dict[str, RPCManager]):
+    total_supply = 0
+    for chain, manager in managers.items():
+        pool = dei_bridge_pools[chain]
+        pool_balance = manager.dei_contract.functions.balanceOf(pool).call()
+        total = manager.dei_contract.functions.totalSupply().call()
+        total_supply += total - pool_balance
+    return total_supply
 
 
 def fetch_dei_seigniorage(manager: RPCManager):

@@ -3,12 +3,12 @@ import time
 
 from config import update_timeout
 from constants import non_circulating_contracts, bridge_pools, xdeus_non_circulating_contracts, xdeus_bridge_pools, \
-    veDEUS_ADDRESS
+    veDEUS_ADDRESS, dei_bridge_pools
 from redis_client import marketcap_db
 
 from utils import RPCManager, deus_spooky, xdeus_price, get_xdeus_reward, get_tl, DataRedisKey, get_tvl, \
     get_alloc_point, get_reward_per_second, fetch_deus_per_week, fetch_dei_circulating_supply, fetch_dei_reserves, \
-    fetch_dei_seigniorage
+    fetch_dei_seigniorage, fetch_dei_total_supply
 
 
 def handle_error(func):
@@ -196,11 +196,18 @@ def dei_reserves_updater(managers):
                                  'total': str(round(total))}))
 
 
+@handle_error
+def dei_total_supply_updater(managers):
+    total_supply = fetch_dei_total_supply(managers)
+    print(f'DEI total supply: {total_supply / 1e18:,.2f}')
+    marketcap_db.set(DataRedisKey.DEI_TOTAL_SUPPLY, total_supply)
+
+
 def run_updater():
     managers = {}
     for chain, _ in non_circulating_contracts.items():
         managers[chain] = RPCManager(chain)
-
+    dei_managers = {chain: RPCManager(chain) for chain in dei_bridge_pools}
     while True:
         slow = 0
         try:
@@ -212,6 +219,7 @@ def run_updater():
             reward_per_second_updater()
             alloc_point_updater()
             dei_reserves_updater(managers)
+            dei_total_supply_updater(dei_managers)
             if slow > 0:
                 slow -= 1
             else:

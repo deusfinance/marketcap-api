@@ -5,6 +5,8 @@ rpcs = {
     'bsc': [],
     'mainnet': [],
     'metis': [],
+    'kava': [],
+    'avax': [],
 }
 
 sheet_url = ''

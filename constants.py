@@ -40,6 +40,16 @@ bridge_pools = {
     'mainnet': '0x5fd564518A71AAB9B1D0Ac6D5825bbBC46a5845e',
 }
 
+dei_bridge_pools = {
+    'fantom': '0xbB8B2F05A88108F7e9227b954358110c20e97E26',
+    'polygon': '0x0dB2e82660812b56BAde5B03059f2b0133Bcd136',
+    'arbitrum': '0xDf00960e0Adfea78EE29dA7FcCA17CFdDDc0A4cA',
+    'bsc': '0x0116a8fC7500Af82c528F5Fb069a84080117482e',
+    'mainnet': '0x4D67A556f6FB7d84A857f363518501c831e1348B',
+    'kava': '0xAAb1688899A833d0b6e0226afCD9a4C1128a5a77',
+    'avax': '0x890fca365e1438B5Adb58a53413c4bf6Cbb1BDE8',
+}
+
 xdeus_non_circulating_contracts = {
     'fantom': {
         'MasterChefV2': '0x62ad8dE6740314677F06723a7A07797aE5082Dbb',
