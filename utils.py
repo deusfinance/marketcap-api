@@ -112,7 +112,7 @@ class RPCManager:
         self.deus_contract = w3.eth.contract(DEUS_ADDRESS, abi=ERC20_ABI)
         self.xdeus_contract = w3.eth.contract(XDEUS_ADDRESS, abi=ERC20_ABI)
         self.dei_contract = w3.eth.contract(DEI_ADDRESS, abi=ERC20_ABI)
-        self.usdc_contract = w3.eth.contract(usdc_address[chain_name], abi=ERC20_ABI)
+        self.usdc_contract = usdc_address.get(chain_name) and w3.eth.contract(usdc_address[chain_name], abi=ERC20_ABI)
 
         if non_circulating_contracts.get(chain_name):
             self.mc = Multicallable(DEUS_ADDRESS, ERC20_ABI, w3)
