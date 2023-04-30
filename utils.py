@@ -187,7 +187,7 @@ def fetch_protocol_owned_dei(managers: Dict[str, RPCManager]):
             _total_lp = amo.functions.totalLP().call()
             _total_supply = lp.functions.totalSupply().call()
             _lp_balance = manager.dei_contract.functions.balanceOf(lp.address).call()
-            amo_dei_lp = (_total_lp / _total_supply) * _lp_balance
+            amo_dei_lp = round((_total_lp / _total_supply) * _lp_balance)
             owned_dei += amo_dei_balance + amo_dei_lp
     return owned_dei
 
