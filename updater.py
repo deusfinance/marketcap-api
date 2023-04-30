@@ -8,7 +8,7 @@ from redis_client import marketcap_db
 
 from utils import RPCManager, deus_spooky, xdeus_price, get_xdeus_reward, get_tl, DataRedisKey, get_tvl, \
     get_alloc_point, get_reward_per_second, fetch_deus_per_week, fetch_dei_circulating_supply, fetch_dei_reserves, \
-    fetch_dei_seigniorage, fetch_dei_total_supply, fetch_protocol_owned_dei
+    fetch_dei_seigniorage, fetch_dei_total_supply, fetch_protocol_owned_dei, fetch_amo_usd_reserves
 
 
 def handle_error(func):
@@ -207,6 +207,13 @@ def protocol_owned_dei_updater(managers):
     marketcap_db.set(DataRedisKey.PROTOCOL_OWNED_DEI, owned_dei)
 
 
+@handle_error
+def amo_usd_reserves_updater(managers):
+    usd_reserves = fetch_amo_usd_reserves(managers)
+    print(f'AMO USD reserves: {usd_reserves / 1e18:,.2f}')
+    marketcap_db.set(DataRedisKey.AMO_USD_RESERVES, usd_reserves)
+
+
 def run_updater():
     deus_managers = {chain: RPCManager(chain) for chain in Network.deus_chains()}
     dei_managers = {chain: RPCManager(chain) for chain in Network.dei_chains()}
@@ -223,6 +230,7 @@ def run_updater():
             dei_reserves_updater(deus_managers)
             dei_total_supply_updater(dei_managers)
             protocol_owned_dei_updater(dei_managers)
+            amo_usd_reserves_updater(dei_managers)
             if slow > 0:
                 slow -= 1
             else:

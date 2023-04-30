@@ -367,6 +367,12 @@ def get_dei_outstanding():
     return jsonify(supply - owned_dei)
 
 
+@app.route('/amoUsdReserves')
+def get_dei_outstanding():
+    usd_reserves = int(marketcap_db.get(DataRedisKey.AMO_USD_RESERVES))
+    return jsonify(usd_reserves)
+
+
 @app.route('/getPrices')
 def get_prices():
     keys = [

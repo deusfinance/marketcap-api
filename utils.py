@@ -87,6 +87,7 @@ class DataRedisKey:
     DEI_SEIGNIORAGE_RATIO = 'DEI_SEIGNIORAGE_RATIO'
     DEI_TOTAL_SUPPLY = 'DEI_TOTAL_SUPPLY'
     PROTOCOL_OWNED_DEI = 'PROTOCOL_OWNED_DEI'
+    AMO_USD_RESERVES = 'AMO_USD_RESERVES'
 
 
 class RouteName:
@@ -112,6 +113,7 @@ class RPCManager:
         w3 = self.get_w3()
         self.amos = [w3.eth.contract(amo, abi=AMO_ABI) for amo in self.network.amos]
         self.lps = [w3.eth.contract(amo.functions.usd_dei().call(), abi=ERC20_ABI) for amo in self.amos]
+        self.usds = [w3.eth.contract(amo.functions.usd().call(), abi=ERC20_ABI) for amo in self.amos]
         self.deus_contract = w3.eth.contract(DEUS_ADDRESS, abi=ERC20_ABI)
         self.xdeus_contract = w3.eth.contract(XDEUS_ADDRESS, abi=ERC20_ABI)
         self.dei_contract = w3.eth.contract(DEI_ADDRESS, abi=ERC20_ABI)
@@ -190,6 +192,20 @@ def fetch_protocol_owned_dei(managers: Dict[str, RPCManager]):
             amo_dei_lp = round((_total_lp / _total_supply) * _lp_balance)
             owned_dei += amo_dei_balance + amo_dei_lp
     return owned_dei
+
+
+def fetch_amo_usd_reserves(managers: Dict[str, RPCManager]):
+    usd_reserves = 0
+    for chain, manager in managers.items():
+        for amo, lp, usd_contract in zip(manager.amos, manager.lps, manager.usds):
+            amo_usd_balance = usd_contract.functions.balanceOf(amo.address).call()
+            _total_lp = amo.functions.totalLP().call()
+            _total_supply = lp.functions.totalSupply().call()
+            _lp_balance = usd_contract.functions.balanceOf(lp.address).call()
+            _decimals = usd_contract.functions.decimals().call()
+            amo_usd_lp = round((_total_lp / _total_supply) * _lp_balance * 10 ** (18 - _decimals))
+            usd_reserves += amo_usd_balance + amo_usd_lp
+    return usd_reserves
 
 
 def fetch_deus_per_week():
