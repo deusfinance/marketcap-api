@@ -158,9 +158,11 @@ def fetch_dei_total_supply(managers: Dict[str, RPCManager]):
     total_supply = 0
     for chain, manager in managers.items():
         pool = manager.network.dei_bridge_pool
+        sig = manager.network.dei_bridge_sig
         pool_balance = manager.dei_contract.functions.balanceOf(pool).call()
+        sig_balance = manager.dei_contract.functions.balanceOf(sig).call()
         total = manager.dei_contract.functions.totalSupply().call()
-        total_supply += total - pool_balance
+        total_supply += total - pool_balance - sig_balance
     return total_supply
 
 

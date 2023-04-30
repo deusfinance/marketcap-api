@@ -36,6 +36,7 @@ class Network:
             }
             self.dues_bridge_pool = '0xf7b38053A4885c99279c4955CB843797e04455f8'
             self.dei_bridge_pool = '0xbB8B2F05A88108F7e9227b954358110c20e97E26'
+            self.dei_bridge_sig = '0x0000000000000000000000000000000000000000'  # FIXME: set this value
             self.xdeus_bridge_pool = '0x0cD61B1Bf6F8F2B6BA03cc8BCc57C941b7cC47a4'
             self.usdc = '0x04068DA6C83AFCFA0e13ba15A6696662335D5B75'
         elif name == Network.POLYGON:
@@ -45,6 +46,7 @@ class Network:
             self.xdeus_non_circulating = None
             self.dues_bridge_pool = '0x1e323B29DeBdd06e5Fa498D380952ae41F46E6E8'
             self.dei_bridge_pool = '0x0dB2e82660812b56BAde5B03059f2b0133Bcd136'
+            self.dei_bridge_sig = '0x0000000000000000000000000000000000000000'  # FIXME: set this value
             self.xdeus_bridge_pool = None
             self.usdc = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174'
         elif name == Network.ARBITRUM:
@@ -52,6 +54,7 @@ class Network:
             self.xdeus_non_circulating = None
             self.dues_bridge_pool = '0x6fF0609046A38D76Bd40C5863b4D1a2dCe687f73'
             self.dei_bridge_pool = '0xDf00960e0Adfea78EE29dA7FcCA17CFdDDc0A4cA'
+            self.dei_bridge_sig = '0x0000000000000000000000000000000000000000'  # FIXME: set this value
             self.xdeus_bridge_pool = None
             self.usdc = '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8'
         elif name == Network.BSC:
@@ -59,6 +62,7 @@ class Network:
             self.xdeus_non_circulating = None
             self.dues_bridge_pool = '0xc0DD739C4A190a45C91ED3EC587B1F3fc4d31BA6'
             self.dei_bridge_pool = '0x0116a8fC7500Af82c528F5Fb069a84080117482e'
+            self.dei_bridge_sig = '0x0000000000000000000000000000000000000000'  # FIXME: set this value
             self.xdeus_bridge_pool = None
             self.usdc = '0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d'
         elif name == Network.MAINNET:
@@ -66,6 +70,7 @@ class Network:
             self.xdeus_non_circulating = None
             self.dues_bridge_pool = '0x5fd564518A71AAB9B1D0Ac6D5825bbBC46a5845e'
             self.dei_bridge_pool = '0x4D67A556f6FB7d84A857f363518501c831e1348B'
+            self.dei_bridge_sig = '0x0000000000000000000000000000000000000000'  # FIXME: set this value
             self.xdeus_bridge_pool = '0x6Ed2b2ac055bd755c3A30Fb9c039922859CaA0ba'
             self.usdc = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
         elif name == Network.METIS:
@@ -73,6 +78,7 @@ class Network:
             self.xdeus_non_circulating = None
             self.dues_bridge_pool = None
             self.dei_bridge_pool = None
+            self.dei_bridge_sig = None
             self.xdeus_bridge_pool = None
             self.usdc = '0xEA32A96608495e54156Ae48931A7c20f0dcc1a21'
         elif name == Network.KAVA:
@@ -80,6 +86,7 @@ class Network:
             self.xdeus_non_circulating = None
             self.dues_bridge_pool = None
             self.dei_bridge_pool = '0xAAb1688899A833d0b6e0226afCD9a4C1128a5a77'
+            self.dei_bridge_sig = '0x0000000000000000000000000000000000000000'  # FIXME: set this value
             self.xdeus_bridge_pool = None
             self.usdc = '0xEB466342C4d449BC9f53A865D5Cb90586f405215'  # Axelar Wrapped USDC
         elif name == Network.AVAX:
@@ -87,6 +94,7 @@ class Network:
             self.xdeus_non_circulating = None
             self.dues_bridge_pool = None
             self.dei_bridge_pool = '0x890fca365e1438B5Adb58a53413c4bf6Cbb1BDE8'
+            self.dei_bridge_sig = '0x0000000000000000000000000000000000000000'  # FIXME: set this value
             self.xdeus_bridge_pool = None
             self.usdc = '0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E'
         else:
