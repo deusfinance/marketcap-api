@@ -373,6 +373,13 @@ def get_amo_usd_reserves():
     return jsonify(usd_reserves)
 
 
+@app.route('/totalReserves')
+def get_total_reserves():
+    dei_reserves = int(marketcap_db.get(DataRedisKey.DEI_RESERVES))
+    usd_reserves = int(marketcap_db.get(DataRedisKey.AMO_USD_RESERVES))
+    return jsonify(dei_reserves + usd_reserves)
+
+
 @app.route('/getPrices')
 def get_prices():
     keys = [
