@@ -334,7 +334,7 @@ def get_dei_stats():
     reserves = json.loads(marketcap_db.get(DataRedisKey.DEI_JSON_RESERVES))
     dei_reserves = int(marketcap_db.get(DataRedisKey.DEI_RESERVES))
     usd_reserves = int(marketcap_db.get(DataRedisKey.AMO_USD_RESERVES)) // 10 ** 18
-    reserves['amoReserves'] = dei_reserves + usd_reserves
+    reserves['amoReserves'] = str(dei_reserves + usd_reserves)
     reserves['total'] = str(int(reserves['total']) + dei_reserves + usd_reserves)
     total_reserves = int(marketcap_db.get(DataRedisKey.DEI_RESERVES))
     usdc_backing_per_dei = round(total_reserves * 1e18 / outstanding, 3)
