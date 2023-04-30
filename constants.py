@@ -29,6 +29,7 @@ class Network:
                 'masterChefEscrow': '0x79EC95B28f8575b1fBcE2d441031B324965B5931',
                 'HedgerInvestmentEscrow': '0x4d601646cE6F359F93673087CdAF415470c61ecC',
                 'xDeusBackingEscrow': '0x0153Bf855fE4c5Dd5ACaf49C49A4a6625f071d93',
+                'GnosisSafeProxy': '0x0BAC771371F25DF85CDbF45C48a11F11332185C2',
             }
             self.xdeus_non_circulating = {
                 'MasterChefV2': '0x62ad8dE6740314677F06723a7A07797aE5082Dbb',
