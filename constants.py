@@ -1,77 +1,175 @@
-non_circulating_contracts = {
-    'fantom': {
-        'DEUS mSig': '0xEf6b0872CfDF881Cf9Fe0918D3FA979c616AF983',
-        'MasterChefV2 old': '0x120FF9821817eA2bbB700e1131e5c856ccC20d1b',
-        'Minter Pool': '0x6E0098A8c651F7A6A9510B270CD02c858C344D94',
-        'DUES BAG': '0xC59A3F19bf33D318F4e3eef248ACFE9B37bfc947',
-        'gnosisSafe': '0x467694A3c9afFfDEB66e2E31F141148287D3Ad1E',
-        'TimeBasedMasterChefRewarder': '0x90177BF4f4a5aaF5812508dbC1EBA8752C5cd605',
-        'ComplexRewarder': '0xDdB816c59200aF55b1Ca20735Ef086626a2C6a8D',
-        'StrategyRewarder': '0x90De614815C1e550213974C2f004C5e56C4a4be0',
-        'MasterChefV2': '0x67932809213AFd6bac5ECD2e4e214Fe18209c419',
-        'MultiRewarderAccess': '0x9909E6046A9Ca950Cd2a28071338BdcB7d33f9Cb',
-        'TimeBasedMasterChefRewarder1': '0xA81E2bA1035f973c734f1eD23a0c0D6d197dd229',
-        'TimeBasedMasterChefRewarder2': '0x58b86B32F560d025594ADFF02073Ae18976C4700',
-        'Admin Wallet': '0xE5227F141575DcE74721f4A9bE2D7D636F923044',
-        'veDIST': '0x09cE8C8E2704E84750E9c1a4F54A30eF60aF0073',
-        'solidlyLabsEscrow': '0xa3C325B6BB922A773924D608ECf8100A1C60F5dB',
-        'masterChefEscrow': '0x79EC95B28f8575b1fBcE2d441031B324965B5931',
-        'HedgerInvestmentEscrow': '0x4d601646cE6F359F93673087CdAF415470c61ecC',
-        'xDeusBackingEscrow': '0x0153Bf855fE4c5Dd5ACaf49C49A4a6625f071d93',
-    },
-    'polygon': {
-        'Migrator': '0xD6739b3012Dd4179C0Cb45C57e6eADD063983143',
-    },
-    'arbitrum': {
-    },
-    'bsc': {
-    },
-    'mainnet': {
-    },
-    'metis': {
-    }
-}
+class Network:
+    FANTOM = 'fantom'
+    POLYGON = 'polygon'
+    ARBITRUM = 'arbitrum'
+    BSC = 'bsc'
+    MAINNET = 'mainnet'
+    METIS = 'metis'
+    KAVA = 'kava'
+    AVAX = 'avax'
 
-bridge_pools = {
-    'fantom': '0xf7b38053A4885c99279c4955CB843797e04455f8',
-    'polygon': '0x1e323B29DeBdd06e5Fa498D380952ae41F46E6E8',
-    'arbitrum': '0x6fF0609046A38D76Bd40C5863b4D1a2dCe687f73',
-    'bsc': '0xc0DD739C4A190a45C91ED3EC587B1F3fc4d31BA6',
-    'mainnet': '0x5fd564518A71AAB9B1D0Ac6D5825bbBC46a5845e',
-}
+    def __init__(self, name: str):
+        if name == Network.FANTOM:
+            self.deus_non_circulating = {
+                'DEUS mSig': '0xEf6b0872CfDF881Cf9Fe0918D3FA979c616AF983',
+                'MasterChefV2 old': '0x120FF9821817eA2bbB700e1131e5c856ccC20d1b',
+                'Minter Pool': '0x6E0098A8c651F7A6A9510B270CD02c858C344D94',
+                'DUES BAG': '0xC59A3F19bf33D318F4e3eef248ACFE9B37bfc947',
+                'gnosisSafe': '0x467694A3c9afFfDEB66e2E31F141148287D3Ad1E',
+                'TimeBasedMasterChefRewarder': '0x90177BF4f4a5aaF5812508dbC1EBA8752C5cd605',
+                'ComplexRewarder': '0xDdB816c59200aF55b1Ca20735Ef086626a2C6a8D',
+                'StrategyRewarder': '0x90De614815C1e550213974C2f004C5e56C4a4be0',
+                'MasterChefV2': '0x67932809213AFd6bac5ECD2e4e214Fe18209c419',
+                'MultiRewarderAccess': '0x9909E6046A9Ca950Cd2a28071338BdcB7d33f9Cb',
+                'TimeBasedMasterChefRewarder1': '0xA81E2bA1035f973c734f1eD23a0c0D6d197dd229',
+                'TimeBasedMasterChefRewarder2': '0x58b86B32F560d025594ADFF02073Ae18976C4700',
+                'Admin Wallet': '0xE5227F141575DcE74721f4A9bE2D7D636F923044',
+                'veDIST': '0x09cE8C8E2704E84750E9c1a4F54A30eF60aF0073',
+                'solidlyLabsEscrow': '0xa3C325B6BB922A773924D608ECf8100A1C60F5dB',
+                'masterChefEscrow': '0x79EC95B28f8575b1fBcE2d441031B324965B5931',
+                'HedgerInvestmentEscrow': '0x4d601646cE6F359F93673087CdAF415470c61ecC',
+                'xDeusBackingEscrow': '0x0153Bf855fE4c5Dd5ACaf49C49A4a6625f071d93',
+            }
+            self.xdeus_non_circulating = {
+                'MasterChefV2': '0x62ad8dE6740314677F06723a7A07797aE5082Dbb',
+                'DEUS mSig': '0xEf6b0872CfDF881Cf9Fe0918D3FA979c616AF983',
+            }
+            self.dues_bridge_pool = '0xf7b38053A4885c99279c4955CB843797e04455f8'
+            self.dei_bridge_pool = '0xbB8B2F05A88108F7e9227b954358110c20e97E26'
+            self.xdeus_bridge_pool = '0x0cD61B1Bf6F8F2B6BA03cc8BCc57C941b7cC47a4'
+            self.usdc = '0x04068DA6C83AFCFA0e13ba15A6696662335D5B75'
+        elif name == Network.POLYGON:
+            self.deus_non_circulating = {
+                'Migrator': '0xD6739b3012Dd4179C0Cb45C57e6eADD063983143',
+            }
+            self.xdeus_non_circulating = None
+            self.dues_bridge_pool = '0x1e323B29DeBdd06e5Fa498D380952ae41F46E6E8'
+            self.dei_bridge_pool = '0x0dB2e82660812b56BAde5B03059f2b0133Bcd136'
+            self.xdeus_bridge_pool = None
+            self.usdc = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174'
+        elif name == Network.ARBITRUM:
+            self.deus_non_circulating = None
+            self.xdeus_non_circulating = None
+            self.dues_bridge_pool = '0x6fF0609046A38D76Bd40C5863b4D1a2dCe687f73'
+            self.dei_bridge_pool = '0xDf00960e0Adfea78EE29dA7FcCA17CFdDDc0A4cA'
+            self.xdeus_bridge_pool = None
+            self.usdc = '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8'
+        elif name == Network.BSC:
+            self.deus_non_circulating = None
+            self.xdeus_non_circulating = None
+            self.dues_bridge_pool = '0xc0DD739C4A190a45C91ED3EC587B1F3fc4d31BA6'
+            self.dei_bridge_pool = '0x0116a8fC7500Af82c528F5Fb069a84080117482e'
+            self.xdeus_bridge_pool = None
+            self.usdc = '0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d'
+        elif name == Network.MAINNET:
+            self.deus_non_circulating = None
+            self.xdeus_non_circulating = None
+            self.dues_bridge_pool = '0x5fd564518A71AAB9B1D0Ac6D5825bbBC46a5845e'
+            self.dei_bridge_pool = '0x4D67A556f6FB7d84A857f363518501c831e1348B'
+            self.xdeus_bridge_pool = '0x6Ed2b2ac055bd755c3A30Fb9c039922859CaA0ba'
+            self.usdc = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
+        elif name == Network.METIS:
+            self.deus_non_circulating = None
+            self.xdeus_non_circulating = None
+            self.dues_bridge_pool = None
+            self.dei_bridge_pool = None
+            self.xdeus_bridge_pool = None
+            self.usdc = '0xEA32A96608495e54156Ae48931A7c20f0dcc1a21'
+        elif name == Network.KAVA:
+            self.deus_non_circulating = None
+            self.xdeus_non_circulating = None
+            self.dues_bridge_pool = None
+            self.dei_bridge_pool = '0xAAb1688899A833d0b6e0226afCD9a4C1128a5a77'
+            self.xdeus_bridge_pool = None
+            self.usdc = '0xEB466342C4d449BC9f53A865D5Cb90586f405215'  # Axelar Wrapped USDC
+        elif name == Network.AVAX:
+            self.deus_non_circulating = None
+            self.xdeus_non_circulating = None
+            self.dues_bridge_pool = None
+            self.dei_bridge_pool = '0x890fca365e1438B5Adb58a53413c4bf6Cbb1BDE8'
+            self.xdeus_bridge_pool = None
+            self.usdc = '0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E'
+        else:
+            raise NameError('Invalid network name')
 
-dei_bridge_pools = {
-    'fantom': '0xbB8B2F05A88108F7e9227b954358110c20e97E26',
-    'polygon': '0x0dB2e82660812b56BAde5B03059f2b0133Bcd136',
-    'arbitrum': '0xDf00960e0Adfea78EE29dA7FcCA17CFdDDc0A4cA',
-    'bsc': '0x0116a8fC7500Af82c528F5Fb069a84080117482e',
-    'mainnet': '0x4D67A556f6FB7d84A857f363518501c831e1348B',
-    'kava': '0xAAb1688899A833d0b6e0226afCD9a4C1128a5a77',
-    'avax': '0x890fca365e1438B5Adb58a53413c4bf6Cbb1BDE8',
-}
+    @classmethod
+    def deus_chains(cls):
+        return cls.FANTOM, cls.POLYGON, cls.ARBITRUM, cls.BSC, cls.MAINNET, cls.METIS
 
-xdeus_non_circulating_contracts = {
-    'fantom': {
-        'MasterChefV2': '0x62ad8dE6740314677F06723a7A07797aE5082Dbb',
-        'DEUS mSig': '0xEf6b0872CfDF881Cf9Fe0918D3FA979c616AF983',
-    },
-    # 'mainnet': {
+    @classmethod
+    def xdeus_chains(cls):
+        return cls.FANTOM,
+
+    @classmethod
+    def dei_chains(cls):
+        return cls.FANTOM, cls.POLYGON, cls.ARBITRUM, cls.BSC, cls.MAINNET, cls.KAVA, cls.AVAX
+
+
+# non_circulating_contracts = {
+    # Network.FANTOM: {
+    #     'DEUS mSig': '0xEf6b0872CfDF881Cf9Fe0918D3FA979c616AF983',
+    #     'MasterChefV2 old': '0x120FF9821817eA2bbB700e1131e5c856ccC20d1b',
+    #     'Minter Pool': '0x6E0098A8c651F7A6A9510B270CD02c858C344D94',
+    #     'DUES BAG': '0xC59A3F19bf33D318F4e3eef248ACFE9B37bfc947',
+    #     'gnosisSafe': '0x467694A3c9afFfDEB66e2E31F141148287D3Ad1E',
+    #     'TimeBasedMasterChefRewarder': '0x90177BF4f4a5aaF5812508dbC1EBA8752C5cd605',
+    #     'ComplexRewarder': '0xDdB816c59200aF55b1Ca20735Ef086626a2C6a8D',
+    #     'StrategyRewarder': '0x90De614815C1e550213974C2f004C5e56C4a4be0',
+    #     'MasterChefV2': '0x67932809213AFd6bac5ECD2e4e214Fe18209c419',
+    #     'MultiRewarderAccess': '0x9909E6046A9Ca950Cd2a28071338BdcB7d33f9Cb',
+    #     'TimeBasedMasterChefRewarder1': '0xA81E2bA1035f973c734f1eD23a0c0D6d197dd229',
+    #     'TimeBasedMasterChefRewarder2': '0x58b86B32F560d025594ADFF02073Ae18976C4700',
+    #     'Admin Wallet': '0xE5227F141575DcE74721f4A9bE2D7D636F923044',
+    #     'veDIST': '0x09cE8C8E2704E84750E9c1a4F54A30eF60aF0073',
+    #     'solidlyLabsEscrow': '0xa3C325B6BB922A773924D608ECf8100A1C60F5dB',
+    #     'masterChefEscrow': '0x79EC95B28f8575b1fBcE2d441031B324965B5931',
+    #     'HedgerInvestmentEscrow': '0x4d601646cE6F359F93673087CdAF415470c61ecC',
+    #     'xDeusBackingEscrow': '0x0153Bf855fE4c5Dd5ACaf49C49A4a6625f071d93',
     # },
-}
+#     Network.POLYGON: {
+#         # 'Migrator': '0xD6739b3012Dd4179C0Cb45C57e6eADD063983143',
+#     },
+#     Network.ARBITRUM: {
+#     },
+#     Network.BSC: {
+#     },
+#     Network.MAINNET: {
+#     },
+#     Network.METIS: {
+#     },
+# }
 
-xdeus_bridge_pools = {
-    'fantom': '0x0cD61B1Bf6F8F2B6BA03cc8BCc57C941b7cC47a4',
-    'mainnet': '0x6Ed2b2ac055bd755c3A30Fb9c039922859CaA0ba',
-}
+# bridge_pools = {
+#     # 'fantom': '0xf7b38053A4885c99279c4955CB843797e04455f8',
+#     # 'polygon': '0x1e323B29DeBdd06e5Fa498D380952ae41F46E6E8',
+#     # 'arbitrum': '0x6fF0609046A38D76Bd40C5863b4D1a2dCe687f73',
+#     # 'bsc': '0xc0DD739C4A190a45C91ED3EC587B1F3fc4d31BA6',
+#     # 'mainnet': '0x5fd564518A71AAB9B1D0Ac6D5825bbBC46a5845e',
+# }
 
-usdc_address = {
-    'fantom': '0x04068DA6C83AFCFA0e13ba15A6696662335D5B75',
-    'polygon': '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',
-    'arbitrum': '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8',
-    'bsc': '0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d',
-    'mainnet': '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-    'metis': '0xEA32A96608495e54156Ae48931A7c20f0dcc1a21',
-}
+# dei_bridge_pools = {
+#     # 'fantom': '0xbB8B2F05A88108F7e9227b954358110c20e97E26',
+#     # 'polygon': '0x0dB2e82660812b56BAde5B03059f2b0133Bcd136',
+#     # 'arbitrum': '0xDf00960e0Adfea78EE29dA7FcCA17CFdDDc0A4cA',
+#     # 'bsc': '0x0116a8fC7500Af82c528F5Fb069a84080117482e',
+#     # 'mainnet': '0x4D67A556f6FB7d84A857f363518501c831e1348B',
+#     # 'kava': '0xAAb1688899A833d0b6e0226afCD9a4C1128a5a77',
+#     # 'avax': '0x890fca365e1438B5Adb58a53413c4bf6Cbb1BDE8',
+# }
+
+# xdeus_non_circulating_contracts = {
+#     # 'fantom': {
+#     #     'MasterChefV2': '0x62ad8dE6740314677F06723a7A07797aE5082Dbb',
+#     #     'DEUS mSig': '0xEf6b0872CfDF881Cf9Fe0918D3FA979c616AF983',
+#     # },
+#     # 'mainnet': {
+#     # },
+# }
+
+# xdeus_bridge_pools = {
+#     # 'fantom': '0x0cD61B1Bf6F8F2B6BA03cc8BCc57C941b7cC47a4',
+#     # 'mainnet': '0x6Ed2b2ac055bd755c3A30Fb9c039922859CaA0ba',
+# }
 
 USDC_ON_FTM = '0x04068DA6C83AFCFA0e13ba15A6696662335D5B75'
 USDC_ON_ETH = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
@@ -80,13 +178,13 @@ USDT_ON_ETH = '0xdAC17F958D2ee523a2206206994597C13D831ec7'
 USDD_ON_ETH = '0x0C10bF8FcB7Bf5412187A595ab97a3609160b5c6'
 
 dei_reserve_addresses = {
-    'mainnet': {
+    Network.MAINNET: {
         '0x5B598261c2A8a9B2fb564Ff26BE93B79A87e554D': [USDC_ON_ETH,
                                                        DAI_ON_ETH,
                                                        USDT_ON_ETH,
                                                        USDD_ON_ETH],
     },
-    'fantom': {
+    Network.FANTOM: {
         '0x6E0098A8c651F7A6A9510B270CD02c858C344D94': [USDC_ON_FTM],
         '0x0092fc463b969347f2F6d18a572BDf99F61B5e8F': [USDC_ON_FTM],
     }

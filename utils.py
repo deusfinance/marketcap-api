@@ -9,11 +9,9 @@ from web3 import HTTPProvider
 from web3.contract import Contract
 
 from abi import DEI_STRATEGY_ABI, ERC20_ABI, MASTERCHEF_XDEUS_ABI, PAIR_ABI, SWAP_FLASHLOAN_ABI, MASTERCHEF_HELPER_ABI
-from constants import DEI_STRATEGY_ADDRESS, DEUS_ADDRESS, SPOOKY_USDC_FTM, SPOOKY_FTM_DEUS, non_circulating_contracts, \
-    XDEUS_DEUS_POOL, \
-    XDEUS_ADDRESS, xdeus_non_circulating_contracts, MASTERCHEF_XDEUS, SOLIDLY_XDEUS_DEUS, MASTERCHEF_HELPER, \
-    DEI_ADDRESS, usdc_address, SOLIDLY_WETH_DEUS, SOLIDLY_WETH_DEI, SOLIDLY_USDC_DEI, dei_reserve_addresses, \
-    dei_reserve_token_symbols, dei_bridge_pools
+from constants import DEI_STRATEGY_ADDRESS, DEUS_ADDRESS, SPOOKY_USDC_FTM, SPOOKY_FTM_DEUS, XDEUS_DEUS_POOL, \
+    XDEUS_ADDRESS, MASTERCHEF_XDEUS, SOLIDLY_XDEUS_DEUS, MASTERCHEF_HELPER, DEI_ADDRESS, SOLIDLY_WETH_DEUS, \
+    SOLIDLY_WETH_DEI, SOLIDLY_USDC_DEI, dei_reserve_addresses, Network
 from config import rpcs, sheet_url
 from redis_client import price_db
 
@@ -107,18 +105,19 @@ class RPCManager:
     def __init__(self, chain_name: str):
         self.chain_name = chain_name
         self.rpcs = deque(rpcs[chain_name])
+        self.network = Network(chain_name)
 
         w3 = self.get_w3()
         self.deus_contract = w3.eth.contract(DEUS_ADDRESS, abi=ERC20_ABI)
         self.xdeus_contract = w3.eth.contract(XDEUS_ADDRESS, abi=ERC20_ABI)
         self.dei_contract = w3.eth.contract(DEI_ADDRESS, abi=ERC20_ABI)
-        self.usdc_contract = usdc_address.get(chain_name) and w3.eth.contract(usdc_address[chain_name], abi=ERC20_ABI)
+        self.usdc_contract = w3.eth.contract(self.network.usdc, abi=ERC20_ABI)
 
-        if non_circulating_contracts.get(chain_name):
+        if chain_name in Network.deus_chains():
             self.mc = Multicallable(DEUS_ADDRESS, ERC20_ABI, w3)
         else:
             self.mc = None
-        if xdeus_non_circulating_contracts.get(chain_name):
+        if chain_name in Network.xdeus_chains():
             self.xmc = Multicallable(XDEUS_ADDRESS, ERC20_ABI, w3)
         else:
             self.xmc = None
@@ -135,7 +134,7 @@ class RPCManager:
         self.deus_contract = w3.eth.contract(DEUS_ADDRESS, abi=ERC20_ABI)
         self.xdeus_contract = w3.eth.contract(XDEUS_ADDRESS, abi=ERC20_ABI)
         self.dei_contract = w3.eth.contract(DEI_ADDRESS, abi=ERC20_ABI)
-        self.usdc_contract = w3.eth.contract(usdc_address[self.chain_name], abi=ERC20_ABI)
+        self.usdc_contract = w3.eth.contract(self.network.usdc, abi=ERC20_ABI)
         if self.mc is not None:
             self.mc = Multicallable(DEUS_ADDRESS, ERC20_ABI, w3)
         if self.xmc is not None:
@@ -164,7 +163,7 @@ def fetch_dei_reserves(managers: Dict[str, RPCManager]):
 def fetch_dei_total_supply(managers: Dict[str, RPCManager]):
     total_supply = 0
     for chain, manager in managers.items():
-        pool = dei_bridge_pools[chain]
+        pool = manager.network.dei_bridge_pool
         pool_balance = manager.dei_contract.functions.balanceOf(pool).call()
         total = manager.dei_contract.functions.totalSupply().call()
         total_supply += total - pool_balance

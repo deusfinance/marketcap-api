@@ -3,12 +3,12 @@ import time
 
 from flask import Flask, jsonify, request
 
-from constants import non_circulating_contracts, xdeus_non_circulating_contracts
+from constants import Network
 from redis_client import marketcap_db, price_db
 from utils import RouteName, PriceRedisKey, DataRedisKey
 
-deus_chains = list(non_circulating_contracts)
-xdeus_chains = list(xdeus_non_circulating_contracts)
+deus_chains = Network.deus_chains()
+xdeus_chains = Network.xdeus_chains()
 app = Flask(__name__)
 
 
