@@ -39,6 +39,7 @@ class Network:
             self.dei_bridge_sig = '0x0000000000000000000000000000000000000000'  # FIXME: set this value
             self.xdeus_bridge_pool = '0x0cD61B1Bf6F8F2B6BA03cc8BCc57C941b7cC47a4'
             self.usdc = '0x04068DA6C83AFCFA0e13ba15A6696662335D5B75'
+            self.amos = []
         elif name == Network.POLYGON:
             self.deus_non_circulating = {
                 'Migrator': '0xD6739b3012Dd4179C0Cb45C57e6eADD063983143',
@@ -49,6 +50,7 @@ class Network:
             self.dei_bridge_sig = '0x0000000000000000000000000000000000000000'  # FIXME: set this value
             self.xdeus_bridge_pool = None
             self.usdc = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174'
+            self.amos = []
         elif name == Network.ARBITRUM:
             self.deus_non_circulating = None
             self.xdeus_non_circulating = None
@@ -57,6 +59,7 @@ class Network:
             self.dei_bridge_sig = '0x0000000000000000000000000000000000000000'  # FIXME: set this value
             self.xdeus_bridge_pool = None
             self.usdc = '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8'
+            self.amos = ['0x1589931E8a0B311Fc37B8DF57131Cbf60754002B', '0x79E0C399816162f00E53D0996Ce4ed2108994316']  # [RAMSES, CHRONOS]
         elif name == Network.BSC:
             self.deus_non_circulating = None
             self.xdeus_non_circulating = None
@@ -65,6 +68,7 @@ class Network:
             self.dei_bridge_sig = '0x0000000000000000000000000000000000000000'  # FIXME: set this value
             self.xdeus_bridge_pool = None
             self.usdc = '0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d'
+            self.amos = ['0x09a8c72BeA36035c4c18DA6c13B4E56F6834Fd0A']  # [THENA]
         elif name == Network.MAINNET:
             self.deus_non_circulating = None
             self.xdeus_non_circulating = None
@@ -73,6 +77,7 @@ class Network:
             self.dei_bridge_sig = '0x0000000000000000000000000000000000000000'  # FIXME: set this value
             self.xdeus_bridge_pool = '0x6Ed2b2ac055bd755c3A30Fb9c039922859CaA0ba'
             self.usdc = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
+            self.amos = ['0x0D5e44ddA87a6Bc0E3adA25014fdceee545e1a05']  # [SOLIDLY]
         elif name == Network.METIS:
             self.deus_non_circulating = None
             self.xdeus_non_circulating = None
@@ -81,6 +86,7 @@ class Network:
             self.dei_bridge_sig = None
             self.xdeus_bridge_pool = None
             self.usdc = '0xEA32A96608495e54156Ae48931A7c20f0dcc1a21'
+            self.amos = []
         elif name == Network.KAVA:
             self.deus_non_circulating = None
             self.xdeus_non_circulating = None
@@ -89,6 +95,7 @@ class Network:
             self.dei_bridge_sig = '0x0000000000000000000000000000000000000000'  # FIXME: set this value
             self.xdeus_bridge_pool = None
             self.usdc = '0xEB466342C4d449BC9f53A865D5Cb90586f405215'  # Axelar Wrapped USDC
+            self.amos = []
         elif name == Network.AVAX:
             self.deus_non_circulating = None
             self.xdeus_non_circulating = None
@@ -97,6 +104,7 @@ class Network:
             self.dei_bridge_sig = '0x0000000000000000000000000000000000000000'  # FIXME: set this value
             self.xdeus_bridge_pool = None
             self.usdc = '0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E'
+            self.amos = []
         else:
             raise NameError('Invalid network name')
 

@@ -8,7 +8,7 @@ from redis_client import marketcap_db
 
 from utils import RPCManager, deus_spooky, xdeus_price, get_xdeus_reward, get_tl, DataRedisKey, get_tvl, \
     get_alloc_point, get_reward_per_second, fetch_deus_per_week, fetch_dei_circulating_supply, fetch_dei_reserves, \
-    fetch_dei_seigniorage, fetch_dei_total_supply
+    fetch_dei_seigniorage, fetch_dei_total_supply, fetch_protocol_owned_dei
 
 
 def handle_error(func):
@@ -31,7 +31,7 @@ def dei_updater(managers):
     print('Circ Supply:', circulating_supply // 10 ** 18)
     marketcap_db.set(DataRedisKey.DEI_CIRCULATING_SUPPLY, circulating_supply)
     dei_seigniorage_ratio = fetch_dei_seigniorage(managers['fantom'])
-    print('DEI Seigniorage ratio', dei_seigniorage_ratio)
+    print('DEI Seigniorage ratio:', dei_seigniorage_ratio)
     marketcap_db.set(DataRedisKey.DEI_SEIGNIORAGE_RATIO, dei_seigniorage_ratio)
 
 
@@ -200,6 +200,13 @@ def dei_total_supply_updater(managers):
     marketcap_db.set(DataRedisKey.DEI_TOTAL_SUPPLY, total_supply)
 
 
+@handle_error
+def protocol_owned_dei_updater(managers):
+    owned_dei = fetch_protocol_owned_dei(managers)
+    print(f'Protocol owned DEI: {owned_dei / 1e18:,.2f}')
+    marketcap_db.set(DataRedisKey.PROTOCOL_OWNED_DEI, owned_dei)
+
+
 def run_updater():
     deus_managers = {chain: RPCManager(chain) for chain in Network.deus_chains()}
     dei_managers = {chain: RPCManager(chain) for chain in Network.dei_chains()}
@@ -208,13 +215,14 @@ def run_updater():
         try:
             deus_updater(deus_managers)
             xdeus_updater(deus_managers)
-            dei_updater(deus_managers)
+            dei_updater(dei_managers)
             tl_updater(deus_managers)
             tvl_updater(deus_managers)
             reward_per_second_updater()
             alloc_point_updater()
             dei_reserves_updater(deus_managers)
             dei_total_supply_updater(dei_managers)
+            protocol_owned_dei_updater(dei_managers)
             if slow > 0:
                 slow -= 1
             else:

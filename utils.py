@@ -85,6 +85,7 @@ class DataRedisKey:
     DEI_JSON_RESERVES = 'DEI_JSON_RESERVES'
     DEI_SEIGNIORAGE_RATIO = 'DEI_SEIGNIORAGE_RATIO'
     DEI_TOTAL_SUPPLY = 'DEI_TOTAL_SUPPLY'
+    PROTOCOL_OWNED_DEI = 'PROTOCOL_OWNED_DEI'
 
 
 class RouteName:
@@ -108,6 +109,8 @@ class RPCManager:
         self.network = Network(chain_name)
 
         w3 = self.get_w3()
+        self.amos = [w3.eth.contract(amo, abi=AMO_ABI) for amo in self.network.amos]
+        self.lps = [w3.eth.contract(amo.functions.usd_dei().call(), abi=ERC20_ABI) for amo in self.amos]
         self.deus_contract = w3.eth.contract(DEUS_ADDRESS, abi=ERC20_ABI)
         self.xdeus_contract = w3.eth.contract(XDEUS_ADDRESS, abi=ERC20_ABI)
         self.dei_contract = w3.eth.contract(DEI_ADDRESS, abi=ERC20_ABI)
@@ -173,6 +176,19 @@ def fetch_dei_seigniorage(manager: RPCManager):
     redeem_collateral_ratio = dei_strategy_contract.functions.redeemCollateralRatio().call()
     dei_seigniorage = mint_collateral_ratio - redeem_collateral_ratio
     return dei_seigniorage
+
+
+def fetch_protocol_owned_dei(managers: Dict[str, RPCManager]):
+    owned_dei = 0
+    for chain, manager in managers.items():
+        for amo, lp in zip(manager.amos, manager.lps):
+            amo_dei_balance = manager.dei_contract.functions.balanceOf(amo.address).call()
+            _total_lp = amo.functions.totalLP().call()
+            _total_supply = lp.functions.totalSupply().call()
+            _lp_balance = manager.dei_contract.functions.balanceOf(lp.address).call()
+            amo_dei_lp = (_total_lp / _total_supply) * _lp_balance
+            owned_dei += amo_dei_balance + amo_dei_lp
+    return owned_dei
 
 
 def fetch_deus_per_week():

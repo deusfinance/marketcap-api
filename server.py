@@ -354,6 +354,19 @@ def get_dei_total_supply():
     return jsonify(supply)
 
 
+@app.route('/dei/protocolOwnedDei')
+def get_protocol_owned_dei():
+    owned_dei = int(marketcap_db.get(DataRedisKey.PROTOCOL_OWNED_DEI))
+    return jsonify(owned_dei)
+
+
+@app.route('/dei/outstanding')
+def get_dei_outstanding():
+    supply = int(marketcap_db.get(DataRedisKey.DEI_TOTAL_SUPPLY))
+    owned_dei = int(marketcap_db.get(DataRedisKey.PROTOCOL_OWNED_DEI))
+    return jsonify(supply - owned_dei)
+
+
 @app.route('/getPrices')
 def get_prices():
     keys = [
