@@ -335,8 +335,7 @@ def get_dei_stats():
     usd_reserves = int(marketcap_db.get(DataRedisKey.AMO_USD_RESERVES)) // 10 ** 18
     reserves['amoReserves'] = str(usd_reserves)
     reserves['total'] = str(int(reserves['total']) + usd_reserves)
-    total_reserves = int(marketcap_db.get(DataRedisKey.DEI_RESERVES))
-    usdc_backing_per_dei = round(total_reserves * 1e18 / outstanding, 3)
+    usdc_backing_per_dei = round(int(reserves['total']) * 1e18 / outstanding, 3)
     dei_seigniorage_ratio = round(int(marketcap_db.get(DataRedisKey.DEI_SEIGNIORAGE_RATIO)) * 100 / 1e6, 3)
     return jsonify({'usdcBackingPerDei': str(usdc_backing_per_dei),
                     'deiSeigniorageRatio': str(dei_seigniorage_ratio),
