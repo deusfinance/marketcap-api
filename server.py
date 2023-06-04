@@ -448,7 +448,10 @@ def get_deus_per_week():
 def get_dei_user_data(address: str):
     address = address.lower()
     if re.match(r'^0x[0-9a-f]{40}$', address) and int(address, 16):
-        return jsonify(dei_users_data[address])
+        data = dei_users_data.get(address)
+        if data:
+            return jsonify(data)
+        return jsonify(status='error', msg='user with this address not found')
     return jsonify(status='error', msg='invalid address')
 
 
