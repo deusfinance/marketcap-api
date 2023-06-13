@@ -15,6 +15,9 @@ app = Flask(__name__)
 with open('dei_users_data.json') as fp:
     dei_users_data = json.load(fp)
 
+with open('dei_users_data_old.json') as fp:
+    dei_users_data_old = json.load(fp)
+
 
 def gradual_circulating_supply(actual_supply):
     base = 122013000000000000000000
@@ -449,6 +452,17 @@ def get_dei_user_data(address: str):
     address = address.lower()
     if re.match(r'^0x[0-9a-f]{40}$', address) and int(address, 16):
         data = dei_users_data.get(address)
+        if data:
+            return jsonify(data)
+        return jsonify(status='error', msg='user with this address not found')
+    return jsonify(status='error', msg='invalid address')
+
+
+@app.route('/dei/userData/<address>/old')
+def get_dei_user_data_old(address: str):
+    address = address.lower()
+    if re.match(r'^0x[0-9a-f]{40}$', address) and int(address, 16):
+        data = dei_users_data_old.get(address)
         if data:
             return jsonify(data)
         return jsonify(status='error', msg='user with this address not found')
