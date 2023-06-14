@@ -458,7 +458,7 @@ def get_dei_user_data(address: str):
     return jsonify(status='error', msg='invalid address')
 
 
-@app.route('/dei/userData/<address>/old')
+@app.route('/dei/userDataOld/<address>')
 def get_dei_user_data_old(address: str):
     address = address.lower()
     if re.match(r'^0x[0-9a-f]{40}$', address) and int(address, 16):
