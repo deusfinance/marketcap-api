@@ -23,8 +23,8 @@ mc_helper = w3.eth.contract(MASTERCHEF_HELPER, abi=MASTERCHEF_HELPER_ABI)
 
 class PriceRedisKey:
     xDEUS_RATIO = 'xDEUS_RATIO'  # decimals 6
-    DEUS_SPOOKY = 'DEUS_SPOOKY'  # decimals 6
-    DEUS_SPIRIT = 'DEUS_SPIRIT'  # decimals 6
+    DEUS_SPOOKY = 'DEUS_SPOOKYSWAP'  # decimals 6
+    DEUS_SPIRIT = 'DEUS_SPIRITSWAP'  # decimals 6
     legacyDEI_SPOOKY = 'legacyDEI_SPOOKY'  # decimals 6
     legacyDEI_SPIRIT = 'legacyDEI_SPIRIT'  # decimals 6
     legacyDEI_SOLIDLY = 'legacyDEI_SOLIDLY'  # decimals 6
