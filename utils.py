@@ -35,6 +35,7 @@ class PriceRedisKey:
     DEUS_SOLIDLY_ETH = 'DEUS_SOLIDLY_ETH'  # decimals 6
     DEI_SOLIDLY_ETH = 'DEI_SOLIDLY_ETH'  # decimals 6
     USDC_KRAKEN = 'USDC_KRAKEN'  # float
+    DEUS_CHRONOS = 'DEUS_CHRONOS'  # decimals 6
 
 
 class DataRedisKey:
@@ -209,6 +210,7 @@ def fetch_amo_usd_reserves(managers: Dict[str, RPCManager]):
 
 
 def fetch_deus_per_week():
+    return '1049.68'
     pattern = r'18</div></th><td class=\"s0\" dir=\"ltr\"></td><td class=\"s2\" dir=\"ltr\">([\d,.]+)<'
     response = requests.get(sheet_url)
     if response:
@@ -290,10 +292,11 @@ def get_ftm_dex_price():
     return usdc_reserve * 10 ** 12 / ftm_reserve
 
 
-def deus_spooky():
-    contract = w3.eth.contract(SPOOKY_FTM_DEUS, abi=PAIR_ABI)
-    reserve_ftm, reserve_deus, _ = contract.functions.getReserves().call()
-    return (reserve_ftm / reserve_deus) * get_ftm_dex_price()
+def deus_chronos():
+    return int(price_db.get(PriceRedisKey.DEUS_CHRONOS)) / 1e6
+    # contract = w3.eth.contract(SPOOKY_FTM_DEUS, abi=PAIR_ABI)
+    # reserve_ftm, reserve_deus, _ = contract.functions.getReserves().call()
+    # return (reserve_ftm / reserve_deus) * get_ftm_dex_price()
 
 
 def get_xdeus_ratio():
@@ -304,4 +307,4 @@ def get_xdeus_ratio():
 
 
 def xdeus_price():
-    return get_xdeus_ratio() * deus_spooky()
+    return get_xdeus_ratio() * deus_chronos()

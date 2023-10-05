@@ -6,7 +6,7 @@ from config import update_timeout
 from constants import veDEUS_ADDRESS, Network
 from redis_client import marketcap_db
 
-from utils import RPCManager, deus_spooky, xdeus_price, get_xdeus_reward, get_tl, DataRedisKey, get_tvl, \
+from utils import RPCManager, deus_chronos, xdeus_price, get_xdeus_reward, get_tl, DataRedisKey, get_tvl, \
     get_alloc_point, get_reward_per_second, fetch_deus_per_week, fetch_dei_circulating_supply, fetch_dei_reserves, \
     fetch_dei_seigniorage, fetch_dei_total_supply, fetch_protocol_owned_dei, fetch_amo_usd_reserves
 
@@ -69,7 +69,7 @@ def deus_updater(managers):
             print('NON-CIRCULATING:', nc_supply)
             print('CIRCULATING:', total_supply - nc_supply)
     try:
-        price = str(deus_spooky())
+        price = str(deus_chronos())
         marketcap_db.set(DataRedisKey.PRICE_TAG, price)
     except Exception as ex:
         print('Error:', ex)
