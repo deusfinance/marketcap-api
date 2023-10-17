@@ -6,13 +6,13 @@ from multicallable import Multicallable
 from web3 import HTTPProvider
 
 from abi import ERC20_ABI, MASTERCHEF_XDEUS_ABI, SWAP_FLASHLOAN_ABI, MASTERCHEF_HELPER_ABI
-from constants import DEUS_ADDRESS, XDEUS_DEUS_POOL, XDEUS_ADDRESS, MASTERCHEF_XDEUS, MASTERCHEF_HELPER, Network
+from constants import DEUS_ADDRESS, XDEUS_DEUS_POOL, MASTERCHEF_XDEUS, MASTERCHEF_HELPER, Network
 from config import rpcs, sheet_url
 from redis_client import price_db
 
-w3 = web3.Web3(web3.HTTPProvider(rpcs['fantom'][0]))
-masterchef_contract = w3.eth.contract(w3.toChecksumAddress(MASTERCHEF_XDEUS), abi=MASTERCHEF_XDEUS_ABI)
-mc_helper = w3.eth.contract(MASTERCHEF_HELPER, abi=MASTERCHEF_HELPER_ABI)
+ftm_w3 = web3.Web3(web3.HTTPProvider(rpcs['fantom'][0]))
+masterchef_contract = ftm_w3.eth.contract(ftm_w3.toChecksumAddress(MASTERCHEF_XDEUS), abi=MASTERCHEF_XDEUS_ABI)
+mc_helper = ftm_w3.eth.contract(MASTERCHEF_HELPER, abi=MASTERCHEF_HELPER_ABI)
 
 
 class PriceRedisKey:
@@ -74,32 +74,25 @@ class RPCManager:
         self.rpcs = deque(rpcs[chain_name])
         self.network = Network(chain_name)
 
-        w3 = self.get_w3()
-        self.deus_contract = w3.eth.contract(DEUS_ADDRESS, abi=ERC20_ABI)
-        self.xdeus_contract = w3.eth.contract(XDEUS_ADDRESS, abi=ERC20_ABI)
-
-        if self.network.deus_non_circulating and chain_name in Network.deus_chains():
-            self.mc = Multicallable(DEUS_ADDRESS, ERC20_ABI, w3)
-        else:
-            self.mc = None
+        self.w3 = self.get_w3()
+        self.deus_contract = self.w3.eth.contract(DEUS_ADDRESS, abi=ERC20_ABI)
+        self.mc = Multicallable(DEUS_ADDRESS, ERC20_ABI, self.w3)
 
     def get_w3(self):
         for rpc in self.rpcs:
             w3 = web3.Web3(HTTPProvider(rpc))
             if w3.isConnected():
-                break
-        return w3
+                return w3
+        raise Exception(f'no RPC connected for {self.chain_name}')
 
     def update_rpc(self):
-        w3 = self.get_w3()
-        self.deus_contract = w3.eth.contract(DEUS_ADDRESS, abi=ERC20_ABI)
-        self.xdeus_contract = w3.eth.contract(XDEUS_ADDRESS, abi=ERC20_ABI)
-        if self.mc is not None:
-            self.mc = Multicallable(DEUS_ADDRESS, ERC20_ABI, w3)
+        self.w3 = self.get_w3()
+        self.deus_contract = self.w3.eth.contract(DEUS_ADDRESS, abi=ERC20_ABI)
+        self.mc = Multicallable(DEUS_ADDRESS, ERC20_ABI, self.w3)
 
 
 def fetch_deus_per_week():
-    return '1049.68'
+    return '913.58'
     pattern = r'18</div></th><td class=\"s0\" dir=\"ltr\"></td><td class=\"s2\" dir=\"ltr\">([\d,.]+)<'
     response = requests.get(sheet_url)
     if response:
@@ -109,9 +102,9 @@ def fetch_deus_per_week():
 
 
 def block_time(duration: int = 20_000):
-    current_block = w3.eth.block_number
-    b = w3.eth.get_block(current_block).timestamp
-    a = w3.eth.get_block(current_block - duration).timestamp
+    current_block = ftm_w3.eth.block_number
+    b = ftm_w3.eth.get_block(current_block).timestamp
+    a = ftm_w3.eth.get_block(current_block - duration).timestamp
     return (b - a) / duration
 
 
@@ -130,13 +123,10 @@ def get_xdeus_reward(xdeus_contract):
 
 def deus_chronos():
     return int(price_db.get(PriceRedisKey.DEUS_CHRONOS)) / 1e6
-    # contract = w3.eth.contract(SPOOKY_FTM_DEUS, abi=PAIR_ABI)
-    # reserve_ftm, reserve_deus, _ = contract.functions.getReserves().call()
-    # return (reserve_ftm / reserve_deus) * get_ftm_dex_price()
 
 
 def get_xdeus_ratio():
-    pool_contract = w3.eth.contract(XDEUS_DEUS_POOL, abi=SWAP_FLASHLOAN_ABI)
+    pool_contract = ftm_w3.eth.contract(XDEUS_DEUS_POOL, abi=SWAP_FLASHLOAN_ABI)
     dx = 1_000_000
     amount = pool_contract.functions.calculateSwap(0, 1, dx).call()
     return round(amount / dx, 3)
