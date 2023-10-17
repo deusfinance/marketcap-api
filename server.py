@@ -202,62 +202,6 @@ def get_xdeus_deus_marketcap():
     return jsonify(deus_marketcap + xdeus_marketcap)
 
 
-@app.route('/tvl')
-def get_tvl():
-    usdc_price = float(price_db.get(PriceRedisKey.USDC_KRAKEN))
-    deus_price = float(marketcap_db.get(DataRedisKey.PRICE_TAG)) * usdc_price
-    xdeus_price = float(marketcap_db.get(DataRedisKey.X_PRICE_TAG)) * usdc_price
-    xdeus_deus_tvl_ftm = round(int(marketcap_db.get(DataRedisKey.xDD_TL_FTM)) * deus_price)
-    xdeus_tvl_ftm = round(int(marketcap_db.get(DataRedisKey.xD_TL_FTM)) * xdeus_price)
-    xdeus_deus_tvl_eth = round(int(marketcap_db.get(DataRedisKey.xDD_TL_ETH)) * deus_price)
-    return jsonify(fantom={'xDEUS-DEUS': xdeus_deus_tvl_ftm, 'xDEUS': xdeus_tvl_ftm},
-                   mainnet={'xDEUS-DEUS': xdeus_deus_tvl_eth})
-
-
-@app.route('/getTVL')
-def get_single_tvl():
-    masterchef = request.args.get('masterchef')
-    pool_id = request.args.get('poolId')
-    if masterchef is None:
-        return jsonify(status='error', msg=f'missing param `masterchef`')
-    if pool_id is None:
-        return jsonify(status='error', msg=f'missing param `poolId`')
-
-    key = None
-    if masterchef == 'xdeus':
-        if pool_id == '0':
-            key = DataRedisKey.TVL_SINGLE_XDEUS
-        elif pool_id == '2':
-            key = DataRedisKey.TVL_XDEUS_DEUS
-    elif masterchef == 'spooky':
-        if pool_id == '0':
-            key = DataRedisKey.TVL_LP_DEUS_FTM
-        elif pool_id == '2':
-            key = DataRedisKey.TVL_LP_DEI_USDC
-    elif masterchef == 'beets':
-        if pool_id == '0':
-            key = DataRedisKey.TVL_BEETS_DEI_USDC
-    elif masterchef == 'bdei':
-        if pool_id == '0':
-            key = DataRedisKey.TVL_SINGLE_BDEI
-        elif pool_id == '1':
-            key = DataRedisKey.TVL_DEI_BDEI
-    elif masterchef == 'solidly':
-        if pool_id == '0':
-            key = DataRedisKey.TVL_SOLIDLY_XDEUS_DEUS
-        elif pool_id == '1':
-            key = DataRedisKey.TVL_SOLIDLY_WETH_DEUS
-        elif pool_id == '2':
-            key = DataRedisKey.TVL_SOLIDLY_WETH_DEI
-        elif pool_id == '3':
-            key = DataRedisKey.TVL_SOLIDLY_USDC_DEI
-    else:
-        return jsonify(status='error', msg=f'invalid masterchef `{masterchef}`')
-    if key is None:
-        return jsonify(status='error', msg=f'invalid  poolId `{pool_id}` for masterchef {masterchef}')
-    return jsonify(int(marketcap_db.get(key)))
-
-
 @app.route('/getRewardPerSecond')
 def get_reward_per_second():
     masterchef = request.args.get('masterchef')
@@ -276,41 +220,6 @@ def get_reward_per_second():
     return jsonify(int(marketcap_db.get(key)))
 
 
-@app.route('/getAllocPoint')
-def get_alloc_point():
-    masterchef = request.args.get('masterchef')
-    pool_id = request.args.get('poolId')
-    if masterchef is None:
-        return jsonify(status='error', msg=f'missing param `masterchef`')
-    if pool_id is None:
-        return jsonify(status='error', msg=f'missing param `poolId`')
-
-    key = None
-    if masterchef == 'xdeus':
-        if pool_id == '0':
-            key = DataRedisKey.AP_SINGLE_XDEUS
-        elif pool_id == '2':
-            key = DataRedisKey.AP_XDEUS_DEUS
-    elif masterchef == 'spooky':
-        if pool_id == '0':
-            key = DataRedisKey.AP_LP_DEUS_FTM
-        elif pool_id == '2':
-            key = DataRedisKey.AP_LP_DEI_USDC
-    elif masterchef == 'beets':
-        if pool_id == '0':
-            key = DataRedisKey.AP_BEETS_DEI_USDC
-    elif masterchef == 'bdei':
-        if pool_id == '0':
-            key = DataRedisKey.AP_SINGLE_BDEI
-        elif pool_id == '1':
-            key = DataRedisKey.AP_DEI_BDEI
-    else:
-        return jsonify(status='error', msg=f'invalid masterchef `{masterchef}`')
-    if key is None:
-        return jsonify(status='error', msg=f'invalid  poolId `{pool_id}` for masterchef {masterchef}')
-    return jsonify(int(marketcap_db.get(key)))
-
-
 @app.route('/dei/price')
 def get_dei_price():
     value = price_db.get(PriceRedisKey.DEI_FIREBIRD)
@@ -319,76 +228,6 @@ def get_dei_price():
     else:
         price = round(int(value) / 1e6, 3)
     return jsonify(price)
-
-
-@app.route('/dei/reserves')
-def get_dei_reserves():
-    reserves = int(marketcap_db.get(DataRedisKey.DEI_RESERVES))
-    return jsonify(reserves)
-
-
-@app.route('/dei/reserves/detail')
-def get_dei_reserves_detail():
-    info = json.loads(marketcap_db.get(DataRedisKey.DEI_JSON_RESERVES))
-    return jsonify(info)
-
-
-@app.route('/dei/getDeiStats')
-def get_dei_stats():
-    total_supply = int(marketcap_db.get(DataRedisKey.DEI_TOTAL_SUPPLY))
-    owned_dei = int(marketcap_db.get(DataRedisKey.PROTOCOL_OWNED_DEI))
-    outstanding = total_supply - owned_dei
-    reserves = json.loads(marketcap_db.get(DataRedisKey.DEI_JSON_RESERVES))
-    usd_reserves = int(marketcap_db.get(DataRedisKey.AMO_USD_RESERVES)) // 10 ** 18
-    reserves['amoReserves'] = str(usd_reserves)
-    reserves['total'] = str(int(reserves['total']) + usd_reserves)
-    usdc_backing_per_dei = round(int(reserves['total']) * 1e18 / outstanding, 3)
-    dei_seigniorage_ratio = round(int(marketcap_db.get(DataRedisKey.DEI_SEIGNIORAGE_RATIO)) * 100 / 1e6, 3)
-    owned_dei = int(marketcap_db.get(DataRedisKey.PROTOCOL_OWNED_DEI))
-    return jsonify({'usdcBackingPerDei': str(usdc_backing_per_dei),
-                    'deiSeigniorageRatio': str(dei_seigniorage_ratio),
-                    'totalSupply': str(total_supply),
-                    'outstanding': str(outstanding),
-                    'protocolOwnedDei': str(owned_dei),
-                    'reserves': reserves})
-
-
-@app.route('/dei/circulating-supply')
-def get_dei_circ_supply():
-    supply = int(marketcap_db.get(DataRedisKey.DEI_CIRCULATING_SUPPLY))
-    return jsonify(supply)
-
-
-@app.route('/dei/allChainsTotalSupply')
-def get_dei_total_supply():
-    supply = int(marketcap_db.get(DataRedisKey.DEI_TOTAL_SUPPLY))
-    return jsonify(supply)
-
-
-@app.route('/dei/protocolOwnedDei')
-def get_protocol_owned_dei():
-    owned_dei = int(marketcap_db.get(DataRedisKey.PROTOCOL_OWNED_DEI))
-    return jsonify(owned_dei)
-
-
-@app.route('/dei/outstanding')
-def get_dei_outstanding():
-    supply = int(marketcap_db.get(DataRedisKey.DEI_TOTAL_SUPPLY))
-    owned_dei = int(marketcap_db.get(DataRedisKey.PROTOCOL_OWNED_DEI))
-    return jsonify(supply - owned_dei)
-
-
-@app.route('/amoUsdReserves')
-def get_amo_usd_reserves():
-    usd_reserves = int(marketcap_db.get(DataRedisKey.AMO_USD_RESERVES))
-    return jsonify(usd_reserves)
-
-
-@app.route('/totalReserves')
-def get_total_reserves():
-    dei_reserves = int(marketcap_db.get(DataRedisKey.DEI_RESERVES)) * 10 ** 18
-    usd_reserves = int(marketcap_db.get(DataRedisKey.AMO_USD_RESERVES))
-    return jsonify(dei_reserves + usd_reserves)
 
 
 @app.route('/getPrices')
