@@ -33,13 +33,17 @@ def deus_updater(managers: Dict[str, RPCManager]):
         print(f'{chain:.^40}')
         try:
             excludes = set(managers[chain].network.excludes['deus'])
-            nc_supply = sum(balance[0] for balance in mc.balanceOf(excludes))
+            nc_supply = sum(mc.balanceOf(excludes).call())
+            supply = managers[chain].deus_contract.functions.totalSupply().call()
             marketcap_db.set(DataRedisKey.NC_SUPPLY + chain, nc_supply)
+            marketcap_db.set(DataRedisKey.CHAIN_TOTAL_SUPPLY + chain, supply)
         except Exception as ex:
             print('Error:', ex)
             managers[chain].update_rpc()
         else:
-            print('NON-CIRCULATING:', nc_supply)
+            print('TOTAL-SUPPLY    :', supply / 1e18)
+            print('NON-CIRCULATING :', nc_supply / 1e18)
+            print('CIRCULATING-SUPP:', (supply - nc_supply) / 1e18)
     try:
         price = str(deus_chronos())
         marketcap_db.set(DataRedisKey.PRICE_TAG, price)
@@ -58,13 +62,17 @@ def xdeus_updater(managers: Dict[str, RPCManager]):
         print(f'{chain:.^40}')
         try:
             excludes = set(managers[chain].network.excludes['xdeus'])
-            nc_supply = sum(balance[0] for balance in xmc.balanceOf(excludes))
+            nc_supply = sum(xmc.balanceOf(excludes).call())
+            supply = xmc._target.functions.totalSupply().call()
             marketcap_db.set(DataRedisKey.X_NC_SUPPLY + chain, nc_supply)
+            marketcap_db.set(DataRedisKey.X_CHAIN_TOTAL_SUPPLY + chain, supply)
         except Exception as ex:
             print('Error:', ex)
             managers[chain].update_rpc()
         else:
-            print('NON-CIRCULATING:', nc_supply)
+            print('TOTAL-SUPPLY    :', supply / 1e18)
+            print('NON-CIRCULATING :', nc_supply / 1e18)
+            print('CIRCULATING-SUPP:', (supply - nc_supply) / 1e18)
     try:
         price = str(xdeus_price())
         marketcap_db.set(DataRedisKey.X_PRICE_TAG, price)

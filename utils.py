@@ -11,7 +11,7 @@ from config import rpcs, sheet_url
 from redis_client import price_db
 
 ftm_w3 = web3.Web3(web3.HTTPProvider(rpcs['fantom'][0]))
-masterchef_contract = ftm_w3.eth.contract(ftm_w3.toChecksumAddress(MASTERCHEF_XDEUS), abi=MASTERCHEF_XDEUS_ABI)
+masterchef_contract = ftm_w3.eth.contract(ftm_w3.to_checksum_address(MASTERCHEF_XDEUS), abi=MASTERCHEF_XDEUS_ABI)
 mc_helper = ftm_w3.eth.contract(MASTERCHEF_HELPER, abi=MASTERCHEF_HELPER_ABI)
 
 
@@ -81,7 +81,7 @@ class RPCManager:
     def get_w3(self):
         for rpc in self.rpcs:
             w3 = web3.Web3(HTTPProvider(rpc))
-            if w3.isConnected():
+            if w3.is_connected():
                 return w3
         raise Exception(f'no RPC connected for {self.chain_name}')
 
@@ -93,12 +93,12 @@ class RPCManager:
 
 def fetch_deus_per_week():
     return '913.58'
-    pattern = r'18</div></th><td class=\"s0\" dir=\"ltr\"></td><td class=\"s2\" dir=\"ltr\">([\d,.]+)<'
-    response = requests.get(sheet_url)
-    if response:
-        raw_deus_per_week: str = re.findall(pattern, response.text)[0]
-        deus_per_week = float(raw_deus_per_week.replace(',', ''))
-        return deus_per_week
+    # pattern = r'18</div></th><td class=\"s0\" dir=\"ltr\"></td><td class=\"s2\" dir=\"ltr\">([\d,.]+)<'
+    # response = requests.get(sheet_url)
+    # if response:
+    #     raw_deus_per_week: str = re.findall(pattern, response.text)[0]
+    #     deus_per_week = float(raw_deus_per_week.replace(',', ''))
+    #     return deus_per_week
 
 
 def block_time(duration: int = 20_000):
