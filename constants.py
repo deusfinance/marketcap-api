@@ -64,17 +64,15 @@ class Network:
                     '0xe3b6CC7b76a7f67BBCcb66c010780bE0AF31Ff05',  # Migrator
                 ],
                 'deus': [
-                    '0xe3b6CC7b76a7f67BBCcb66c010780bE0AF31Ff05',  # Migrator
-                    '0xb80cF3af288f24D6EEe35183eDA1564bfeEb874a',  # WhiteHat msig
-                    '0x5354b4e74642712199Df4Ab524f96c5C0c8fBA69',  # BridgeWallet (Lafa)
+                    '0x7F5Ae1dC8D2B5d599409C57978D21Cf596D37996',  # BridgeEscrow
                     '0xe432150cce91c13a887f7D836923d5597adD8E31',  # AxelarGateway
-                    '0x1589931E8a0B311Fc37B8DF57131Cbf60754002B',  # DAO_ARB AMO msig
-                    '0xFa78086986cA5A111497A07b4200391721eC1035',  # RamsesBeaconProxy
+                    '0xe3b6CC7b76a7f67BBCcb66c010780bE0AF31Ff05',  # Migrator
                     '0xA16C48C4a07CDCd519b4354C2D094eA509124615',  # DEI incident merkle claim
-                    '0x77eeaf07C050a690f9B3C2E8e7642Cc3CBEcEEb4',  # BribeWallet Ross
-                    '0x0cF9Ce01b99A62B1c2AE7A79370aF5f8518dfa9d',  # BribeContract
-                    '0x825736E7336232CC595C345D049474226Fdd154e',  # Holder (solidly migrator)
+                    '0xAB9b83a7F3416d921464aB018AE273fb4b284E86',  # BridgeWallet (Lafa)
+                    '0x1589931E8a0B311Fc37B8DF57131Cbf60754002B',  # DAO_ARBAMOmsig
+                    '0xFa78086986cA5A111497A07b4200391721eC1035',  # RamsesBeaconProxy
                     '0x42d05d13F951AA7c35Cc14453D594427928bF898',  # FeeDistributor
+                    '0x0cF9Ce01b99A62B1c2AE7A79370aF5f8518dfa9d',  # BribeContract
                 ],
             }
         elif name == Network.POLYGON:
