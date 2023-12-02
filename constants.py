@@ -42,6 +42,7 @@ class Network:
                     '0xC59A3F19bf33D318F4e3eef248ACFE9B37bfc947',  # DEUS bag
                     '0x0092fc463b969347f2F6d18a572BDf99F61B5e8F',  # Manifold
                     '0x6E0098A8c651F7A6A9510B270CD02c858C344D94',  # BuyBacker
+                    '0x83B285E802D76055169B1C5e3bF21702B85b89Cb',  # Lafa
                 ],
             }
         elif name == Network.MAINNET:
@@ -56,6 +57,7 @@ class Network:
                     '0xe458B32a21320d539941836995D6c059988f40CA',  # Holder
                     '0x34424Fff5E91d7CE07E82d2e9c8A1a02fA4D0cF2',  # veSOLID escrow
                     '0xf3f5E899059728e0c8aADd38779720549cf37a18',  # anyDEUS (bridge)
+                    '0x83B285E802D76055169B1C5e3bF21702B85b89Cb',  # Lafa
                 ],
             }
         elif name == Network.ARBITRUM:
@@ -73,6 +75,7 @@ class Network:
                     '0xFa78086986cA5A111497A07b4200391721eC1035',  # RamsesBeaconProxy
                     '0x42d05d13F951AA7c35Cc14453D594427928bF898',  # FeeDistributor
                     '0x0cF9Ce01b99A62B1c2AE7A79370aF5f8518dfa9d',  # BribeContract
+                    '0x83B285E802D76055169B1C5e3bF21702B85b89Cb',  # Lafa
                 ],
             }
         elif name == Network.POLYGON:
@@ -82,6 +85,7 @@ class Network:
                     '0x8878Eb7F44f969D0ed72c6010932791397628546',  # AXL Gateway
                     '0xe3b6CC7b76a7f67BBCcb66c010780bE0AF31Ff05',  # Migrator
                     '0x77eeaf07C050a690f9B3C2E8e7642Cc3CBEcEEb4',  # RossBribingWallet
+                    '0x83B285E802D76055169B1C5e3bF21702B85b89Cb',  # Lafa
                 ],
             }
         elif name == Network.BSC:
@@ -95,6 +99,7 @@ class Network:
                     '0x50437C8AD1fC8c40BF361d531a4f0eD215175eA1',  # ThenaBribeContract
                     '0x95fB54D8B17c8f7e94DA3aCb8D6cd11FAC29a969',  # ThenaBribeContract
                     '0xaB1Ad7FA79508ac913d3C30EA8952a4486a74451',  # ThenaBribeContract
+                    '0x83B285E802D76055169B1C5e3bF21702B85b89Cb',  # Lafa
                 ],
             }
         elif name == Network.KAVA:
@@ -102,6 +107,7 @@ class Network:
                 'deus': [
                     '0xE5227F141575DcE74721f4A9bE2D7D636F923044',  # * non circulating
                     '0x8c352C7e3559390EB7e9B84b291997a89A5abc93',  # * migrated
+                    '0x83B285E802D76055169B1C5e3bF21702B85b89Cb',  # Lafa
                 ],
             }
         elif name == Network.AVAX:
@@ -113,6 +119,7 @@ class Network:
                     '0xfE5f33b4cA3992af32d3b53BA7dBFA53e4d2c281',  # BribeWallet (Ross)
                     '0x4a0A3902e091cdb3AEc4279a6BFAC50297F0A79e',  # WHALE
                     '0x83B4678A24955A4100bad18f34dE65D03C711f4C',  # ExternalBribe
+                    '0x83B285E802D76055169B1C5e3bF21702B85b89Cb',  # Lafa
                 ],
             }
         elif name == Network.BASE:
@@ -122,6 +129,7 @@ class Network:
                     '0xAB9b83a7F3416d921464aB018AE273fb4b284E86',  # WhiteKnight
                     '0x83B285E802D76055169B1C5e3bF21702B85b89Cb',  # Lafa
                     '0xcf66F70B7d88749C1Fd2c4287Dc637ca24BA3AF2',  # BribeVotingReward
+                    '0x83B285E802D76055169B1C5e3bF21702B85b89Cb',  # Lafa
                 ],
             }
         else:
@@ -143,6 +151,11 @@ class Network:
     def leg_dei_chains(cls):
         return cls.FANTOM,
 
+
+ARB_NO_SUPPLY = [
+    '0x7F5Ae1dC8D2B5d599409C57978D21Cf596D37996',  # BridgeEscrow
+    '0xe432150cce91c13a887f7D836923d5597adD8E31',  # AxelarGateway
+]
 
 DEUS_ADDRESS = '0xDE5ed76E7c05eC5e4572CfC88d1ACEA165109E44'
 XDEUS_ADDRESS = '0x953Cd009a490176FcEB3a26b9753e6F01645ff28'
