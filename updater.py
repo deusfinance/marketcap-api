@@ -5,7 +5,7 @@ from multicallable import Multicallable
 
 from abi import ERC20_ABI
 from config import update_timeout
-from constants import Network, XDEUS_ADDRESS
+from constants import Network, XDEUS_ADDRESS, ARB_NO_SUPPLY
 from redis_client import marketcap_db
 
 from utils import RPCManager, deus_chronos, xdeus_price, get_xdeus_reward, DataRedisKey, get_reward_per_second, \
@@ -35,6 +35,10 @@ def deus_updater(managers: Dict[str, RPCManager]):
             excludes = set(managers[chain].network.excludes['deus'])
             nc_supply = sum(mc.balanceOf(excludes).call())
             supply = managers[chain].deus_contract.functions.totalSupply().call()
+            if chain == Network.ARBITRUM:
+                no_supply = sum(mc.balanceOf(ARB_NO_SUPPLY).call())
+                print('ARB-NO-SUPPLY   :', no_supply / 1e18)
+                supply -= no_supply
             marketcap_db.set(DataRedisKey.NC_SUPPLY + chain, nc_supply)
             marketcap_db.set(DataRedisKey.CHAIN_TOTAL_SUPPLY + chain, supply)
         except Exception as ex:
