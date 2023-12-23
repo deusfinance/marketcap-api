@@ -26,6 +26,7 @@ class Network:
                 ],
                 'xdeus': [
                     '0xe3b6CC7b76a7f67BBCcb66c010780bE0AF31Ff05',  # Migrator
+                    '0x62ad8dE6740314677F06723a7A07797aE5082Dbb',  # xDEUS masterchef
                     '0x0cD61B1Bf6F8F2B6BA03cc8BCc57C941b7cC47a4',  # Bridge
                     '0x8783fbD927cA247bf0685E2B5B757ed7f85A6A86',  # BridgeWallet (Lafa)
                     '0x5354b4e74642712199Df4Ab524f96c5C0c8fBA69',  # BridgeWallet (Lafa)
