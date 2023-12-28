@@ -5,7 +5,7 @@ from flask import Flask, jsonify, request
 
 from constants import Network, DEUS_FIXED_TOTAL_SUPPLY
 from redis_client import marketcap_db, price_db
-from utils import RouteName, PriceRedisKey, DataRedisKey
+from utils import RouteName, PriceRedisKey, DataRedisKey, get_deus_remaining
 
 deus_chains = Network.deus_chains()
 xdeus_chains = Network.xdeus_chains()
@@ -47,6 +47,10 @@ def get_marketcap_info():
         totalAmounts['totalSupplyOnChain'] += chain_total_supply
         totalAmounts['nonCirculatingSupply'] += non_circulating_supply
         totalAmounts['circulatingSupply'] += circulating_supply
+
+    deus_remaining = get_deus_remaining()
+    if deus_remaining:
+        totalAmounts['circulatingSupply'] = deus_remaining
 
     totalAmounts['totalSupply'] = DEUS_FIXED_TOTAL_SUPPLY
     totalAmounts['FDV'] = round(DEUS_FIXED_TOTAL_SUPPLY * deus_price / 1e18)
@@ -101,6 +105,11 @@ def get_deus_info(route):
         non_circulating_supply += int(marketcap_db.get(DataRedisKey.NC_SUPPLY + chain))
         chain_total_supply += int(marketcap_db.get(DataRedisKey.CHAIN_TOTAL_SUPPLY + chain))
     circulating_supply = chain_total_supply - non_circulating_supply
+
+    deus_remaining = get_deus_remaining()
+    if deus_remaining:
+        circulating_supply = deus_remaining
+
     total_supply = DEUS_FIXED_TOTAL_SUPPLY
     if route == RouteName.CIRCULATING_SUPPLY:
         return jsonify(round(circulating_supply))

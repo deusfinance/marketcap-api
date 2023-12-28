@@ -7,7 +7,7 @@ from web3 import HTTPProvider
 
 from abi import ERC20_ABI, MASTERCHEF_XDEUS_ABI, SWAP_FLASHLOAN_ABI, MASTERCHEF_HELPER_ABI
 from constants import DEUS_ADDRESS, XDEUS_DEUS_POOL, MASTERCHEF_XDEUS, MASTERCHEF_HELPER, Network
-from config import rpcs, sheet_url
+from config import rpcs, sheet_url, symm_api_url
 from redis_client import price_db
 
 ftm_w3 = web3.Web3(web3.HTTPProvider(rpcs['fantom'][0]))
@@ -134,3 +134,12 @@ def get_xdeus_ratio():
 
 def xdeus_price():
     return get_xdeus_ratio() * deus_chronos()
+
+
+def get_deus_remaining():
+    url = f'{symm_api_url}/v1/info'
+    response = requests.get(url)
+    if response:
+        info = response.json()
+        return round(float(info['total_migrated_to_deus']))
+    return None
