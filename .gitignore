@@ -2,6 +2,6 @@
 __pycache__
 .venv/
 .env/
-config.py
+local_settings.py
 .temp.py
 *.json

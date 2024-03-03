@@ -169,3 +169,22 @@ MASTERCHEF_XDEUS = '0x62ad8dE6740314677F06723a7A07797aE5082Dbb'
 MASTERCHEF_HELPER = '0x852D150abF696B34676fEf634e0Ee974D170416B'
 
 DEUS_FIXED_TOTAL_SUPPLY = 250_000 * 10 ** 18
+
+# local settings
+rpcs = {
+    'fantom': [],
+    'polygon': [],
+    'arbitrum': [],
+    'bsc': [],
+    'mainnet': [],
+    'metis': [],
+    'kava': [],
+    'avax': [],
+    'base': [],
+}
+
+symm_api_url = 'https://info.deus.finance/symm'
+sheet_url = ''
+REDIS_MARKETCAP_DB = 0
+REDIS_PRICE_DB = 1
+update_timeout = 60
