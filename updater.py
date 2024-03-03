@@ -7,8 +7,7 @@ from abi import ERC20_ABI
 from settings import update_timeout, Network, XDEUS_ADDRESS, ARB_NO_SUPPLY
 from redis_client import marketcap_db
 
-from utils import RPCManager, deus_chronos, xdeus_price, get_xdeus_reward, DataRedisKey, get_reward_per_second, \
-    fetch_deus_per_week
+from utils import RPCManager, deus_chronos, xdeus_price, DataRedisKey, get_reward_per_second, fetch_deus_per_week
 
 
 def handle_error(func):
