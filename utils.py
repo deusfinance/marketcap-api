@@ -7,7 +7,7 @@ from web3 import HTTPProvider
 
 from abi import ERC20_ABI, MASTERCHEF_XDEUS_ABI, SWAP_FLASHLOAN_ABI, MASTERCHEF_HELPER_ABI
 from settings import DEUS_ADDRESS, XDEUS_DEUS_POOL, MASTERCHEF_XDEUS, MASTERCHEF_HELPER, Network, rpcs, sheet_url, \
-    symm_api_url
+    symm_api_url, NEW_DEUS_ADDRESS
 from redis_client import price_db
 
 ftm_w3 = web3.Web3(web3.HTTPProvider(rpcs['fantom'][0]))
@@ -75,8 +75,9 @@ class RPCManager:
         self.network = Network(chain_name)
 
         self.w3 = self.get_w3()
-        self.deus_contract = self.w3.eth.contract(DEUS_ADDRESS, abi=ERC20_ABI)
-        self.mc = Multicallable(DEUS_ADDRESS, ERC20_ABI, self.w3)
+        self.deus_address = NEW_DEUS_ADDRESS if chain_name == Network.FANTOM else DEUS_ADDRESS
+        self.deus_contract = self.w3.eth.contract(self.deus_address, abi=ERC20_ABI)
+        self.mc = Multicallable(self.deus_address, ERC20_ABI, self.w3)
 
     def get_w3(self):
         for rpc in self.rpcs:
@@ -87,8 +88,8 @@ class RPCManager:
 
     def update_rpc(self):
         self.w3 = self.get_w3()
-        self.deus_contract = self.w3.eth.contract(DEUS_ADDRESS, abi=ERC20_ABI)
-        self.mc = Multicallable(DEUS_ADDRESS, ERC20_ABI, self.w3)
+        self.deus_contract = self.w3.eth.contract(self.deus_address, abi=ERC20_ABI)
+        self.mc = Multicallable(self.deus_address, ERC20_ABI, self.w3)
 
 
 def fetch_deus_per_week():
@@ -137,6 +138,8 @@ def xdeus_price():
 
 
 def get_deus_remaining():
+    # TODO: it's temporary
+    return
     url = f'{symm_api_url}/v1/info'
     response = requests.get(url)
     if response:
