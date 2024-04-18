@@ -1,3 +1,6 @@
+import json
+import re
+
 from flask import Flask, jsonify, request
 
 from settings import Network, DEUS_FIXED_TOTAL_SUPPLY
@@ -255,6 +258,21 @@ def get_deus_per_week():
     except:
         return jsonify(status='error', msg='N/A'), 400
     return jsonify(deus_per_week), 200
+
+
+with open('dei_users_data.json') as fp:
+    dei_users_data = json.load(fp)
+
+
+@app.route('/dei/userData/<address>')
+def get_dei_user_data(address: str):
+    address = address.lower()
+    if re.match(r'^0x[0-9a-f]{40}$', address) and int(address, 16):
+        data = dei_users_data.get(address)
+        if data:
+            return jsonify(data)
+        return jsonify(status='error', msg='user with this address not found')
+    return jsonify(status='error', msg='invalid address')
 
 
 if __name__ == '__main__':
