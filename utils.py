@@ -7,10 +7,10 @@ from web3 import HTTPProvider
 
 from abi import ERC20_ABI, MASTERCHEF_XDEUS_ABI, SWAP_FLASHLOAN_ABI, MASTERCHEF_HELPER_ABI
 from settings import DEUS_ADDRESS, XDEUS_DEUS_POOL, MASTERCHEF_XDEUS, MASTERCHEF_HELPER, Network, rpcs, sheet_url, \
-    symm_api_url, NEW_DEUS_ADDRESS
+    symm_api_url, NEW_DEUS_ADDRESS, proxies
 from redis_client import price_db
 
-ftm_w3 = web3.Web3(web3.HTTPProvider(rpcs['fantom'][0]))
+ftm_w3 = web3.Web3(web3.HTTPProvider(rpcs['fantom'][0], request_kwargs=dict(proxies=proxies)))
 masterchef_contract = ftm_w3.eth.contract(ftm_w3.to_checksum_address(MASTERCHEF_XDEUS), abi=MASTERCHEF_XDEUS_ABI)
 mc_helper = ftm_w3.eth.contract(MASTERCHEF_HELPER, abi=MASTERCHEF_HELPER_ABI)
 
@@ -81,7 +81,7 @@ class RPCManager:
 
     def get_w3(self):
         for rpc in self.rpcs:
-            w3 = web3.Web3(HTTPProvider(rpc))
+            w3 = web3.Web3(HTTPProvider(rpc, request_kwargs=dict(proxies=proxies)))
             if w3.is_connected():
                 return w3
         raise Exception(f'no RPC connected for {self.chain_name}')
@@ -141,7 +141,7 @@ def get_deus_remaining():
     # TODO: it's temporary
     return
     url = f'{symm_api_url}/v1/info'
-    response = requests.get(url)
+    response = requests.get(url, proxies=proxies)
     if response:
         info = response.json()
         return round(float(info['total_migrated_to_deus']))
