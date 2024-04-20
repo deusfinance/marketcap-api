@@ -8,6 +8,7 @@ class Network:
     KAVA = 'kava'
     AVAX = 'avax'
     BASE = 'base'
+    BLAST = 'blast'
 
     def __init__(self, name: str):
         if name == Network.FANTOM:
@@ -47,9 +48,12 @@ class Network:
                     '0x77eeaf07C050a690f9B3C2E8e7642Cc3CBEcEEb4',  # RossBribingWallet
                     '0x04063BE551982933c2F512A0f116D6ECc445F8eC',  # DeusOps
                     '0xBB901d8D3fAF0b675e443B2DE743d149bfe68353',  # ClaimDeus contract
-                    '0x6c9E3B6b6C528ffdF0b5248a2B47069fcEc9e835',  # DeusConversion contract
+                    '0x6c9E3B6b6C528ffdF0b5248a2B47069fcEc9e835',  # DeusConversion contract V2
                     '0x4353a3fCb13E334fd63B929f06661D56A6466833',  # escrow bridge manager
                     '0x33257c271cD2414B444a00346dDaE6f2BB757372',  # AxelarGateway
+                    '0x7F5Ae1dC8D2B5d599409C57978D21Cf596D37996',  # new msig
+                    '0x9f273FF7B9E16FA5A6e08CF7257d6E697F2B3C5A',  # DeusConversion contract V1
+                    '0x4353a3fCb13E334fd63B929f06661D56A6466833',  # Escrow
                 ],
             }
         elif name == Network.MAINNET:
@@ -67,6 +71,7 @@ class Network:
                     '0x83B285E802D76055169B1C5e3bF21702B85b89Cb',  # Lafa
                     '0x77eeaf07C050a690f9B3C2E8e7642Cc3CBEcEEb4',  # RossBribingWallet
                     '0x04063BE551982933c2F512A0f116D6ECc445F8eC',  # DeusOps
+                    '0x7F5Ae1dC8D2B5d599409C57978D21Cf596D37996',  # new msig
                 ],
             }
         elif name == Network.ARBITRUM:
@@ -75,7 +80,7 @@ class Network:
                     '0xe3b6CC7b76a7f67BBCcb66c010780bE0AF31Ff05',  # Migrator
                 ],
                 'deus': [
-                    '0x7F5Ae1dC8D2B5d599409C57978D21Cf596D37996',  # BridgeEscrow
+                    '0x7F5Ae1dC8D2B5d599409C57978D21Cf596D37996',  # new msig
                     '0xe432150cce91c13a887f7D836923d5597adD8E31',  # AxelarGateway
                     '0xe3b6CC7b76a7f67BBCcb66c010780bE0AF31Ff05',  # Migrator
                     '0xA16C48C4a07CDCd519b4354C2D094eA509124615',  # DEI incident merkle claim
@@ -98,6 +103,7 @@ class Network:
                     '0x77eeaf07C050a690f9B3C2E8e7642Cc3CBEcEEb4',  # RossBribingWallet
                     '0x83B285E802D76055169B1C5e3bF21702B85b89Cb',  # Lafa
                     '0x04063BE551982933c2F512A0f116D6ECc445F8eC',  # DeusOps
+                    '0x7F5Ae1dC8D2B5d599409C57978D21Cf596D37996',  # new msig
                 ],
             }
         elif name == Network.BSC:
@@ -114,6 +120,7 @@ class Network:
                     '0x83B285E802D76055169B1C5e3bF21702B85b89Cb',  # Lafa
                     '0x04063BE551982933c2F512A0f116D6ECc445F8eC',  # DeusOps
                     '0x38A0b1cf61581f290D14016b2D37807d28CfF57b',  # AxelarGateway
+                    '0x7F5Ae1dC8D2B5d599409C57978D21Cf596D37996',  # new msig
                 ],
             }
         elif name == Network.KAVA:
@@ -125,6 +132,7 @@ class Network:
                     '0x77eeaf07C050a690f9B3C2E8e7642Cc3CBEcEEb4',  # RossBribingWallet
                     '0x04063BE551982933c2F512A0f116D6ECc445F8eC',  # DeusOps
                     '0xC8c1073Bb5b83f28778E5844469604BD0c4E293d',  # AxelarGateway
+                    '0x7F5Ae1dC8D2B5d599409C57978D21Cf596D37996',  # new msig
                 ],
             }
         elif name == Network.AVAX:
@@ -139,6 +147,7 @@ class Network:
                     '0x83B285E802D76055169B1C5e3bF21702B85b89Cb',  # Lafa
                     '0x77eeaf07C050a690f9B3C2E8e7642Cc3CBEcEEb4',  # RossBribingWallet
                     '0x04063BE551982933c2F512A0f116D6ECc445F8eC',  # DeusOps
+                    '0x7F5Ae1dC8D2B5d599409C57978D21Cf596D37996',  # new msig
                 ],
             }
         elif name == Network.BASE:
@@ -154,12 +163,19 @@ class Network:
                     '0x0013efdA0FE688894b85707B89d7F0fb1a39f354',  # AxelarGateway
                 ],
             }
+        elif name == Network.BLAST:
+            self.excludes = {
+                'deus': [
+                    '0x7B38CBF4250aEA97a80927c09baD72467eaEf5A6',  # AxelarGateway
+                    '0x9f665cf27dEf8CcEb051cd7ac778632200885Ca7',  # blast new msig
+                ],
+            }
         else:
             raise NameError('Invalid network name')
 
     @classmethod
     def deus_chains(cls):
-        return cls.FANTOM, cls.POLYGON, cls.ARBITRUM, cls.BSC, cls.MAINNET, cls.AVAX, cls.KAVA, cls.BASE
+        return cls.FANTOM, cls.POLYGON, cls.ARBITRUM, cls.BSC, cls.MAINNET, cls.AVAX, cls.KAVA, cls.BASE, cls.BLAST
 
     @classmethod
     def xdeus_chains(cls):
@@ -173,11 +189,6 @@ class Network:
     def leg_dei_chains(cls):
         return cls.FANTOM,
 
-
-# ARB_NO_SUPPLY = [
-#     '0x7F5Ae1dC8D2B5d599409C57978D21Cf596D37996',  # BridgeEscrow
-#     '0xe432150cce91c13a887f7D836923d5597adD8E31',  # AxelarGateway
-# ]
 
 NEW_DEUS_ADDRESS = '0xDE55B113A27Cc0c5893CAa6Ee1C020b6B46650C0'
 DEUS_ADDRESS = '0xDE5ed76E7c05eC5e4572CfC88d1ACEA165109E44'
@@ -203,6 +214,7 @@ rpcs = {
     'kava': [],
     'avax': [],
     'base': [],
+    'blast': [],
 }
 
 symm_api_url = 'https://info.deus.finance/symm'
