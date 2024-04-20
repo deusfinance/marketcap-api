@@ -52,7 +52,7 @@ class Network:
                     '0x4353a3fCb13E334fd63B929f06661D56A6466833',  # escrow bridge manager
                     '0x33257c271cD2414B444a00346dDaE6f2BB757372',  # AxelarGateway
                     '0x7F5Ae1dC8D2B5d599409C57978D21Cf596D37996',  # new msig
-                    '0x9f273FF7B9E16FA5A6e08CF7257d6E697F2B3C5A',  # DeusConversion contract V1
+                    # '0x9f273FF7B9E16FA5A6e08CF7257d6E697F2B3C5A',  # DeusConversion contract V1
                     '0x4353a3fCb13E334fd63B929f06661D56A6466833',  # Escrow
                 ],
             }
