@@ -48,7 +48,7 @@ class Network:
                     '0x77eeaf07C050a690f9B3C2E8e7642Cc3CBEcEEb4',  # RossBribingWallet
                     '0x04063BE551982933c2F512A0f116D6ECc445F8eC',  # DeusOps
                     '0xBB901d8D3fAF0b675e443B2DE743d149bfe68353',  # ClaimDeus contract
-                    '0x6c9E3B6b6C528ffdF0b5248a2B47069fcEc9e835',  # DeusConversion contract V2
+                    # '0x6c9E3B6b6C528ffdF0b5248a2B47069fcEc9e835',  # DeusConversion contract V2
                     '0x4353a3fCb13E334fd63B929f06661D56A6466833',  # escrow bridge manager
                     '0x33257c271cD2414B444a00346dDaE6f2BB757372',  # AxelarGateway
                     '0x7F5Ae1dC8D2B5d599409C57978D21Cf596D37996',  # new msig
