@@ -7,7 +7,7 @@ from abi import ERC20_ABI
 from settings import update_timeout, Network, XDEUS_ADDRESS
 from redis_client import marketcap_db
 
-from utils import RPCManager, deus_chronos, xdeus_price, DataRedisKey, get_reward_per_second, fetch_deus_per_week
+from utils import RPCManager, deus_aerodrome, xdeus_price, DataRedisKey, get_reward_per_second, fetch_deus_per_week
 
 
 def handle_error(func):
@@ -47,7 +47,7 @@ def deus_updater(managers: Dict[str, RPCManager]):
             print('NON-CIRCULATING :', nc_supply / 1e18)
             print('CIRCULATING-SUPP:', (supply - nc_supply) / 1e18)
     try:
-        price = str(deus_chronos())
+        price = str(deus_aerodrome())
         marketcap_db.set(DataRedisKey.PRICE_TAG, price)
     except Exception as ex:
         print('Error:', ex)

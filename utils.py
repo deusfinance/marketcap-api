@@ -29,7 +29,7 @@ class PriceRedisKey:
     DEUS_SOLIDLY_ETH = 'DEUS_SOLIDLY_ETH'  # decimals 6
     DEI_SOLIDLY_ETH = 'DEI_SOLIDLY_ETH'  # decimals 6
     USDC_KRAKEN = 'USDC_KRAKEN'  # float
-    DEUS_CHRONOS = 'DEUS_CHRONOS'  # decimals 6
+    DEUS_AERODROME = 'DEUS_AERODROME'  # decimals 6
 
 
 class DataRedisKey:
@@ -122,8 +122,8 @@ def get_xdeus_reward(xdeus_contract):
     return max(reward, 0)
 
 
-def deus_chronos():
-    return int(price_db.get(PriceRedisKey.DEUS_CHRONOS)) / 1e6
+def deus_aerodrome():
+    return int(price_db.get(PriceRedisKey.DEUS_AERODROME)) / 1e6
 
 
 def get_xdeus_ratio():
@@ -134,7 +134,7 @@ def get_xdeus_ratio():
 
 
 def xdeus_price():
-    return get_xdeus_ratio() * deus_chronos()
+    return get_xdeus_ratio() * deus_aerodrome()
 
 
 def get_deus_remaining():
