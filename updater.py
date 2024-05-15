@@ -4,7 +4,7 @@ from typing import Dict
 from multicallable import Multicallable
 
 from abi import ERC20_ABI
-from settings import update_timeout, Network, XDEUS_ADDRESS
+from settings import update_timeout, Network, XDEUS_ADDRESS, global_excludes
 from redis_client import marketcap_db
 
 from utils import RPCManager, deus_aerodrome, xdeus_price, DataRedisKey, get_reward_per_second, fetch_deus_per_week
@@ -31,6 +31,7 @@ def deus_updater(managers: Dict[str, RPCManager]):
         print(f'{chain:.^40}')
         try:
             excludes = set(managers[chain].network.excludes['deus'])
+            excludes.update(global_excludes['deus'])
             nc_supply = sum(mc.balanceOf(excludes).call())
             supply = managers[chain].deus_contract.functions.totalSupply().call()
             # if chain == Network.ARBITRUM:
