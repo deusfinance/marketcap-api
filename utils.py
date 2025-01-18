@@ -6,8 +6,8 @@ from multicallable import Multicallable
 from web3 import HTTPProvider
 
 from abi import ERC20_ABI, MASTERCHEF_XDEUS_ABI, SWAP_FLASHLOAN_ABI, MASTERCHEF_HELPER_ABI
-from settings import DEUS_ADDRESS, XDEUS_DEUS_POOL, MASTERCHEF_XDEUS, MASTERCHEF_HELPER, Network, rpcs, sheet_url, \
-    symm_api_url, NEW_DEUS_ADDRESS, proxies
+from settings import DEUS_ADDRESS, XDEUS_DEUS_POOL, MASTERCHEF_XDEUS, MASTERCHEF_HELPER, Network, rpcs, symm_api_url, \
+    NEW_DEUS_ADDRESS, proxies
 from redis_client import price_db
 
 ftm_w3 = web3.Web3(web3.HTTPProvider(rpcs['fantom'][0], request_kwargs=dict(proxies=proxies)))
@@ -95,12 +95,6 @@ class RPCManager:
 
 def fetch_deus_per_week():
     return '913.58'
-    # pattern = r'18</div></th><td class=\"s0\" dir=\"ltr\"></td><td class=\"s2\" dir=\"ltr\">([\d,.]+)<'
-    # response = requests.get(sheet_url)
-    # if response:
-    #     raw_deus_per_week: str = re.findall(pattern, response.text)[0]
-    #     deus_per_week = float(raw_deus_per_week.replace(',', ''))
-    #     return deus_per_week
 
 
 def block_time(duration: int = 20_000):

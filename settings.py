@@ -1,3 +1,64 @@
+import os
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+rpcs = {
+    'fantom': [
+        'https://rpcapi.fantom.network',
+        'https://rpc.ankr.com/fantom',
+        'https://rpc.ftm.tools',
+        'https://1rpc.io/ftm',
+    ],
+    'polygon': [
+        'https://polygon-rpc.com',
+        'https://poly-rpc.gateway.pokt.network',
+        'https://polygon-mainnet.public.blastapi.io',
+    ],
+    'arbitrum': [
+        'https://arb1.arbitrum.io/rpc',
+        'https://rpc.ankr.com/arbitrum',
+    ],
+    'bsc': [
+        'https://bsc-dataseed4.ninicoin.io',
+        'https://bsc-dataseed3.defibit.io',
+        'https://bsc-dataseed1.binance.org',
+    ],
+    'mainnet': [
+        'https://ethereum.publicnode.com',
+        'https://eth-mainnet.public.blastapi.io',
+        'https://rpc.builder0x69.io',
+    ],
+    'metis': [
+        'https://andromeda.metis.io/?owner=1088'
+    ],
+    'kava': [
+        'https://evm.kava.io'
+    ],
+    'avax': [
+        'https://api.avax.network/ext/bc/C/rpc'
+    ],
+    'base': [
+        'https://base.publicnode.com'
+    ],
+    'blast': [
+        'https://blast.blockpi.network/v1/rpc/public',
+        'https://rpc.blast.io',
+        'https://blastl2-mainnet.public.blastapi.io',
+    ],
+    'xlayer': [
+        'https://xlayerrpc.okx.com',
+        'https://endpoints.omniatech.io/v1/xlayer/mainnet/public',
+    ],
+    'mantle': [
+        'https://mantle-rpc.publicnode.com',
+        'https://mantle-mainnet.public.blastapi.io',
+        'https://rpc.mantle.xyz',
+    ],
+}
+
+
 class Network:
     FANTOM = 'fantom'
     POLYGON = 'polygon'
@@ -206,26 +267,12 @@ MASTERCHEF_HELPER = '0x852D150abF696B34676fEf634e0Ee974D170416B'
 
 DEUS_FIXED_TOTAL_SUPPLY = 250_000 * 10 ** 18
 
-# local settings
-rpcs = {
-    'fantom': [],
-    'polygon': [],
-    'arbitrum': [],
-    'bsc': [],
-    'mainnet': [],
-    'metis': [],
-    'kava': [],
-    'avax': [],
-    'base': [],
-    'blast': [],
-    'xlayer': [],
-    'mantle': [],
-}
-
-symm_api_url = 'https://info.deus.finance/symm'
-sheet_url = ''
-REDIS_MARKETCAP_DB = 0
-REDIS_PRICE_DB = 1
-update_timeout = 60
-
+# .env settings
+symm_api_url = os.environ.get('SYMM_API_URL') or 'https://info.deus.finance/symm'
+REDIS_MARKETCAP_DB = int(os.environ.get('MARKETCAP_REDIS_N') or 0)
+REDIS_PRICE_DB = int(os.environ.get('PRICE_REDIS_N') or 1)
+update_timeout = int(os.environ.get('UPDATE_TIMEOUT') or 60)
 proxies = None
+if os.environ.get('REQUESTS_PROXY_ENABLE') in ('true', 'True', '1'):
+    port = int(os.environ['SOCKS5_PORT'])
+    proxies = {'http': f'socks5h://127.0.0.1:{port}', 'https': f'socks5h://127.0.0.1:{port}'}
