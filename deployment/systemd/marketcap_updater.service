@@ -1,0 +1,16 @@
+[Unit]
+Description=Marketcap updater
+After=network.target redis.service
+Requires=redis.service
+
+[Service]
+Type=simple
+User=user
+WorkingDirectory=%h%/
+ExecStart=%h%/.venv/bin/python %h%/updater.py
+Restart=on-failure
+RestartSec=5
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

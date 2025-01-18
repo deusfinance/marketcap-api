@@ -1,0 +1,16 @@
+[Unit]
+Description=Marketcap server
+After=network.target redis.service marketcap_updater.service
+Requires=redis.service marketcap_updater.service
+
+[Service]
+Type=simple
+User=user
+WorkingDirectory=%h%/
+ExecStart=%h%/.venv/bin/python %h%/server.py
+Restart=on-failure
+RestartSec=5
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target
