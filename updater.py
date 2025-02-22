@@ -107,17 +107,12 @@ def deus_per_week_updater():
 
 def run_updater():
     deus_managers = {chain: RPCManager(chain) for chain in Network.deus_chains()}
+    deus_per_week_updater()
     while True:
-        slow = 0
         try:
             deus_updater(deus_managers)
             xdeus_updater(deus_managers)
             reward_per_second_updater()
-            if slow > 0:
-                slow -= 1
-            else:
-                deus_per_week_updater()
-                slow = 60
         except KeyboardInterrupt:
             break
         time.sleep(update_timeout)

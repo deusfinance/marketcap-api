@@ -56,6 +56,10 @@ rpcs = {
         'https://mantle-mainnet.public.blastapi.io',
         'https://rpc.mantle.xyz',
     ],
+    'sonic': [
+        'https://sonic.drpc.org',
+        'https://rpc.soniclabs.com',
+    ],
 }
 
 
@@ -72,6 +76,7 @@ class Network:
     BLAST = 'blast'
     XLAYER = 'xlayer'
     MANTLE = 'mantle'
+    SONIC = 'sonic'
 
     def __init__(self, name: str):
         if name == Network.FANTOM:
@@ -109,11 +114,10 @@ class Network:
                     '0x6E0098A8c651F7A6A9510B270CD02c858C344D94',  # BuyBacker
                     '0xBB901d8D3fAF0b675e443B2DE743d149bfe68353',  # ClaimDeus contract
                     # '0x6c9E3B6b6C528ffdF0b5248a2B47069fcEc9e835',  # DeusConversion contract V2
-                    '0x4353a3fCb13E334fd63B929f06661D56A6466833',  # escrow bridge manager
                     '0x33257c271cD2414B444a00346dDaE6f2BB757372',  # AxelarGateway
                     '0x7F5Ae1dC8D2B5d599409C57978D21Cf596D37996',  # msig
                     # '0x9f273FF7B9E16FA5A6e08CF7257d6E697F2B3C5A',  # DeusConversion contract V1
-                    '0x4353a3fCb13E334fd63B929f06661D56A6466833',  # Escrow
+                    '0x183Daf1e89763968C1BFbd1C98BC1a44820f0729',  # Escrow
                     '0x5E0ddC17e87077ce74ddf46B82f026E0d260FE3b',  # tiny msig
                 ],
             }
@@ -225,13 +229,20 @@ class Network:
                     '0xA0650CFeF40C9BCCD006D3966Dedd963d7d656D6',  # mantle msig
                 ],
             }
+        elif name == Network.SONIC:
+            self.excludes = {
+                'deus': [
+                    '0xfAc44Ee29f75F47C0836460EC61Dcd3BefA71877',  # sonic msig
+                    '0x8897ef501b65a2C6df85bAF44eC6b64de6e7DD03',  # Escrow
+                ],
+            }
         else:
             raise NameError('Invalid network name')
 
     @classmethod
     def deus_chains(cls):
         return (cls.FANTOM, cls.POLYGON, cls.ARBITRUM, cls.BSC, cls.MAINNET,
-                cls.AVAX, cls.KAVA, cls.BASE, cls.BLAST, cls.XLAYER)
+                cls.AVAX, cls.KAVA, cls.BASE, cls.BLAST, cls.XLAYER, cls.SONIC)
 
     @classmethod
     def xdeus_chains(cls):

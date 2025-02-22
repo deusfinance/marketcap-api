@@ -76,7 +76,7 @@ class RPCManager:
 
         self.w3 = self.get_w3()
         self.deus_address = NEW_DEUS_ADDRESS if chain_name in (
-            Network.FANTOM, Network.BLAST, Network.XLAYER) else DEUS_ADDRESS
+            Network.FANTOM, Network.BLAST, Network.XLAYER, Network.SONIC) else DEUS_ADDRESS
         self.deus_contract = self.w3.eth.contract(self.deus_address, abi=ERC20_ABI)
         self.mc = Multicallable(self.deus_address, ERC20_ABI, self.w3)
 
