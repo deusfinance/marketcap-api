@@ -17,7 +17,7 @@ def get_marketcap_info():
     deus_price = float(marketcap_db.get(DataRedisKey.PRICE_TAG)) * usdc_price
     xdeus_price = float(marketcap_db.get(DataRedisKey.X_PRICE_TAG)) * usdc_price
     result = dict(price=dict(deus=str(deus_price), xdeus=str(xdeus_price)), result={})
-    totalAmounts = dict(totalSupply=0,
+    total_amounts = dict(totalSupply=0,
                         totalSupplyOnChain=0,
                         supplyInBridges=0,
                         supplyInVeDeusContract=0,
@@ -38,20 +38,20 @@ def get_marketcap_info():
                            circulatingSupply=str(circulating_supply),
                            FDV=str(0),
                            marketCap=str(0))
-        totalAmounts['totalSupplyOnChain'] += chain_total_supply
-        totalAmounts['nonCirculatingSupply'] += non_circulating_supply
-        totalAmounts['circulatingSupply'] += circulating_supply
+        total_amounts['totalSupplyOnChain'] += chain_total_supply
+        total_amounts['nonCirculatingSupply'] += non_circulating_supply
+        total_amounts['circulatingSupply'] += circulating_supply
 
     deus_remaining = get_deus_remaining()
     if deus_remaining:
-        totalAmounts['circulatingSupply'] = deus_remaining
+        total_amounts['circulatingSupply'] = deus_remaining
 
-    totalAmounts['totalSupply'] = DEUS_FIXED_TOTAL_SUPPLY
-    totalAmounts['FDV'] = round(DEUS_FIXED_TOTAL_SUPPLY * deus_price / 1e18)
-    totalAmounts['marketCap'] = round(totalAmounts['circulatingSupply'] * deus_price / 1e18)
-    deus['total'] = {k: str(v) for k, v in totalAmounts.items()}
+    total_amounts['totalSupply'] = DEUS_FIXED_TOTAL_SUPPLY
+    total_amounts['FDV'] = round(DEUS_FIXED_TOTAL_SUPPLY * deus_price / 1e18)
+    total_amounts['marketCap'] = round(total_amounts['circulatingSupply'] * deus_price / 1e18)
+    deus['total'] = {k: str(v) for k, v in total_amounts.items()}
 
-    totalAmounts = dict(totalSupply=0,
+    total_amounts = dict(totalSupply=0,
                         totalSupplyOnChain=0,
                         circulatingSupply=0,
                         supplyInBridges=0,
@@ -70,13 +70,13 @@ def get_marketcap_info():
                             circulatingSupply=str(circulating_supply),
                             FDV=str(0),
                             marketCap=str(0))
-        totalAmounts['totalSupplyOnChain'] += chain_total_supply
-        totalAmounts['nonCirculatingSupply'] += non_circulating_supply
-        totalAmounts['circulatingSupply'] += circulating_supply
-    totalAmounts['totalSupply'] = totalAmounts['totalSupplyOnChain']
-    totalAmounts['FDV'] = round(totalAmounts['totalSupply'] * xdeus_price / 1e18)
-    totalAmounts['marketCap'] += round(totalAmounts['circulatingSupply'] * xdeus_price / 1e18)
-    xdeus['total'] = {k: str(v) for k, v in totalAmounts.items()}
+        total_amounts['totalSupplyOnChain'] += chain_total_supply
+        total_amounts['nonCirculatingSupply'] += non_circulating_supply
+        total_amounts['circulatingSupply'] += circulating_supply
+    total_amounts['totalSupply'] = total_amounts['totalSupplyOnChain']
+    total_amounts['FDV'] = round(total_amounts['totalSupply'] * xdeus_price / 1e18)
+    total_amounts['marketCap'] += round(total_amounts['circulatingSupply'] * xdeus_price / 1e18)
+    xdeus['total'] = {k: str(v) for k, v in total_amounts.items()}
 
     result['result'] = dict(deus=deus, xdeus=xdeus)
     return result
